@@ -1,17 +1,32 @@
-import * as api from 'strateegia-api';
+import * as api from "strateegia-api";
 import * as d3 from 'd3';
-import { color } from 'd3';
 
-export async function gatherGraphData(accessToken, projectId) {
+export async function gatherGraphData(accessToken, projectId, mode) {
 
   const cData = {
     nodes: [],
     links: []
   };
 
-  const fData = {};
+  // const fData = {};
 
-  const filters = {};
+  // let filters = {};
+
+  // if (mode === "usuário") {
+  //   filters = {
+  //     group: group => ["comment", "reply", "agreement", "users", "user"].includes(group),
+  //     // group: group => ["project", "map", "kit", "question", "comment", "reply", "agreement", "users", "user"].includes(group),
+  //   };
+  // } else if (mode === "projeto") {
+  //   filters = {
+  //     // group: group => ["comment", "reply", "agreement", "users", "user"].includes(group),
+  //     group: group => ["project", "map", "kit", "question", "comment", "reply", "agreement"].includes(group),
+  //   };
+  // } else if (mode === "indicadores") {
+  //   filters = {
+  //     group: group => ["project", "map", "kit", "question", "comment", "reply", "agreement", "users", "user"].includes(group),
+  //   };
+  // }
 
   function mapColorAndSize(group) {
     const groups = ["project", "map", "divpoint", "question", "comment", "reply", "agreement", "user", "users"];
@@ -42,6 +57,7 @@ export async function gatherGraphData(accessToken, projectId) {
   }
 
   function addLink(source, target) {
+    // console.log("addLink %o %o", source, target);
     const targetNode = cData.nodes.find(x => x.id === target);
     if (targetNode !== undefined) {
       targetNode.parentId = source;
@@ -58,6 +74,13 @@ export async function gatherGraphData(accessToken, projectId) {
     const dashboardUrl = `https://app.strateegia.digital/journey/${projectId}`;
     addNode(projectId, project.title, "project", project.created_at, dashboardUrl);
   }
+
+  addNode("users", "Usuários", "users", project.created_at);
+  project.users.forEach(user => {
+    addNode(user.id, user.name, "user", project.created_at);
+    addLink("users", user.id);
+  });
+
   const mapRequests = [];
   project.maps.forEach(map => {
     const mapId = map.id;
@@ -109,35 +132,56 @@ export async function gatherGraphData(accessToken, projectId) {
         const commentId = comment.id;
         const commentText = comment.text;
         const commentCreatedAt = comment.created_at;
+        const commentCreatedBy = comment.created_by;
         const questionIdForGraph = `${comment.divergence_point_id}#${comment.question_id}`;
         addNode(commentId, commentText, "comment", commentCreatedAt, null);
-        addLink(questionIdForGraph, commentId);
+        if (mode === "projeto") {
+          addLink(questionIdForGraph, commentId);
+        } else {
+          addLink(commentCreatedBy, commentId); // USER
+        }
         const replies = comment.replies;
         replies.forEach(reply => {
           const replyId = reply.id;
           const replyText = reply.text;
           const replyCreatedAt = reply.created_at;
+          const replyCreatedBy = reply.created_by;
           addNode(replyId, replyText, "reply", replyCreatedAt, null);
-          addLink(commentId, replyId);
+          if (mode === "projeto") {
+            addLink(commentId, replyId);
+          } else {
+            addLink(replyCreatedBy, replyId); // USER
+          }
           reply.agreements.forEach((agreement, index) => {
             const agreementId = `${replyId}#${index}`;
             const agreementText = "OK";
             const agreementCreatedAt = agreement.created_at;
+            const agreementCreatedBy = agreement.user_id;
             addNode(agreementId, agreementText, "agreement", agreementCreatedAt, null);
-            addLink(replyId, agreementId);
+            if (mode === "projeto") {
+              addLink(replyId, agreementId);
+            } else {
+              addLink(agreementCreatedBy, agreementId); // USER
+            }
           });
         });
         const agreements = comment.agreements;
         agreements.forEach((agreement, index) => {
+          // console.log("about agreement %o", agreement)
           const agreementId = `${commentId}#${index}`;
           const agreementText = "OK";
           const agreementCreatedAt = agreement.created_at;
+          const agreementCreatedBy = agreement.user_id;
           addNode(agreementId, agreementText, "agreement", agreementCreatedAt, null);
-          addLink(commentId, agreementId);
+          if (mode === "projeto") {
+            addLink(commentId, agreementId);
+          } else {
+            addLink(agreementCreatedBy, agreementId); // USER
+          }
         });
       });
     });
   });
-  // console.log(cData);
+  console.log(cData);
   return cData;
 }
