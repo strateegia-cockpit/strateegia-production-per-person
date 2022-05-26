@@ -1,10 +1,19 @@
-import { Box, Heading, ListItem, Text, UnorderedList } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import {
+  Box,
+  Heading,
+  Table,
+  TableContainer,
+  Tbody,
+  Td,
+  Th,
+  Thead,
+  Tr,
+} from "@chakra-ui/react";
+import { useEffect, useState, Fragment } from "react";
 import * as api from "strateegia-api";
 import Loading from "../components/Loading";
 import MapList from "../components/MapList";
 import ProjectList from "../components/ProjectList";
-import DivPointList from "../components/DivPointList";
 
 export default function Main() {
   const [selectedProject, setSelectedProject] = useState("");
@@ -12,7 +21,7 @@ export default function Main() {
   const [selectedDivPoint, setSelectedDivPoint] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [accessToken, setAccessToken] = useState("");
-  const [mapDetails, setMapDetails] = useState(null);
+  const [commentsReport, setCommentsReport] = useState(null);
 
   const handleSelectChange = (e) => {
     setSelectedProject(e.target.value);
@@ -27,7 +36,7 @@ export default function Main() {
   };
 
   useEffect(() => {
-    setMapDetails(null);
+    setCommentsReport(null);
     setSelectedMap("");
     setSelectedDivPoint("");
   }, [selectedProject]);
@@ -38,8 +47,33 @@ export default function Main() {
       setIsLoading(true);
       try {
         const response = await api.getMapById(accessToken, selectedMap);
-        setMapDetails({ ...response });
-        console.log("mapDetails: %o", mapDetails);
+        const divPointsRequest = [];
+        response?.points
+          ?.filter((point) => point.point_type === "DIVERGENCE")
+          .forEach((divPoint) => {
+            console.log(divPoint.title);
+            divPointsRequest.push(
+              api
+                .getDivergencePointById(accessToken, divPoint.id)
+                .then((divPointRes) => {
+                  return api
+                    .getCommentsGroupedByQuestionReport(
+                      accessToken,
+                      divPoint.id
+                    )
+                    .then((res) => {
+                      return {
+                        divPoint: divPointRes,
+                        commentsByQuestion: res,
+                      };
+                    });
+                })
+            );
+          });
+        const divPointsResponse = await Promise.all(divPointsRequest);
+        console.log("divPoints %o", divPointsResponse);
+        setCommentsReport([...divPointsResponse]);
+        // console.log("mapDetails: %o", response);
         // [TODO] - use the access token to fetch the data
         // [TODO] - add the fetch data function here
       } catch (error) {
@@ -57,42 +91,56 @@ export default function Main() {
   return (
     <Box padding={10}>
       <Heading as="h3" size="md" mb={3}>
-        [applet title here]
+        relatório de comentários
       </Heading>
       <ProjectList handleSelectChange={handleSelectChange} />
       <MapList
         projectId={selectedProject}
         handleSelectChange={handleMapSelectChange}
       />
-      <DivPointList
+      {/* <DivPointList
         mapId={selectedMap}
         handleSelectChange={handleDivPointSelectChange}
-      />
+      /> */}
       <Loading active={isLoading} />
       {/* [TODO] Add you component here */}
-      {mapDetails?.points ? (
-        <Box mt={3}>
-          <Heading as="h3" size="md" mb={3}>
-            Map Details
-          </Heading>
-          <Text>Title: {mapDetails?.title}</Text>
-          <Text>ID: {mapDetails?.id}</Text>
-          <Text>Created at: {mapDetails?.created_at}</Text>
-          <Text>Points: {mapDetails?.points?.length}</Text>
-          <UnorderedList>
-            {mapDetails?.points?.map((point) => (
-              <ListItem>
-                {point.point_type}:{" "}
-                {point.point_type === "CONVERSATION"
-                  ? point.description
-                  : point.title}
-              </ListItem>
-            ))}
-          </UnorderedList>
-        </Box>
-      ) : null}
-      {selectedDivPoint !== "" ? (
-        <Text> Selected Divergence Point: {selectedDivPoint}</Text>
+      {commentsReport ? (
+        <TableContainer mt={3}>
+          <Table size="sm">
+            <Thead>
+              <Tr>
+                <Th>DivPoint Title</Th>
+                <Th>Question</Th>
+                <Th>Comment</Th>
+                <Th>Author</Th>
+              </Tr>
+            </Thead>
+            <Tbody>
+              {commentsReport?.map((item) => {
+                return (
+                  <Fragment>
+                    {item.commentsByQuestion.map((question) => {
+                      return (
+                        <Tr>
+                          <Td>{item.divPoint.tool.title}</Td>
+                          <Td>
+                            {
+                              item.divPoint.tool.questions.find(
+                                (d) => d.id === question.id
+                              ).question
+                            }
+                          </Td>
+                          <Td>{question.comments[0].text}</Td>
+                          <Td>{question.comments[0].author.name}</Td>
+                        </Tr>
+                      );
+                    })}
+                  </Fragment>
+                );
+              })}
+            </Tbody>
+          </Table>
+        </TableContainer>
       ) : null}
     </Box>
   );
