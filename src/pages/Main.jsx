@@ -162,9 +162,9 @@ export default function Main() {
               <Thead>
                 <Tr>
                   <Th>usuário</Th>
-                  <Th>comments</Th>
-                  <Th>replies</Th>
-                  <Th>agreements</Th>
+                  <Th>respostas às questões</Th>
+                  <Th>comentários às respostas</Th>
+                  <Th>concordâncias</Th>
                 </Tr>
               </Thead>
               <Tbody>
