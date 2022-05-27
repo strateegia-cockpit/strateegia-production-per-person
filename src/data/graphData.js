@@ -185,3 +185,31 @@ export async function gatherGraphData(accessToken, projectId, mode) {
   console.log(cData);
   return cData;
 }
+
+export async function extractUserCommentInfo(accessToken, projectId) {
+  const cData = await gatherGraphData(accessToken, projectId, "usuário");
+  const fullLinks = cData.links.map(link => {
+    return {
+      source: cData.nodes.find(node => node.id === link.source),
+      target: cData.nodes.find(node => node.id === link.target)
+    }
+  });
+  console.log("fullLinks %o", fullLinks);
+  const onlyUsers = fullLinks.filter(item => item.source.group === 'user');
+  const limpando = onlyUsers.map(item => { return `${item.source.title},${item.target.group}` });
+  console.log("author,item");
+  // limpando.forEach(d => console.log(d));
+  const output = limpando.map(item => { return { user: item.split(',')[0], action: item.split(',')[1] } });
+  const auxCounter = d3.group(output, d => d.user, d => d.action);
+  console.log("auxCounter %o", auxCounter);
+  const counter = Array.from(auxCounter, ([key, values]) => {
+    return {
+      user: key,
+      comments: values.get("comment"),
+      replies: values.get("reply"),
+      agreements: values.get("agreement")
+    }
+  });
+  console.log("counter %o", counter);
+  return auxCounter;
+}
