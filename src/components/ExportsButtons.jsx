@@ -1,60 +1,55 @@
 import { Button, Box } from "@chakra-ui/react";
 import { CSVLink } from "react-csv";
 
-export function ExportsButtons({ checkpointAndComments }) {
-  
+export function ExportsButtons({ data }) {
   const headers = [
     {
-      label: "Conv. Point Description",
-      key: "description",
+      label: "usuários",
+      key: "users",
     },
     {
-      label: "Local",
-      key: "meeting_place",
+      label: "comments",
+      key: "comments",
     },
     {
-      label: "Date",
-      key: "opening_date",
+      label: "replies",
+      key: "replies",
     },
     {
-      label: "Comments",
-      key: "texts",
-    },
-    {
-      label: "Authors",
-      key: "authors",
+      label: "agreements",
+      key: "agreements",
     },
   ];
 
-  const checkpoint = checkpointAndComments?.map(({ checkpoint }) => {
-    return {
-      description: checkpoint.description,
-      meeting_place: checkpoint.meeting_place,
-      opening_date: checkpoint.opening_date,
-    };
-  });
+  // const checkpoint = data?.map(({ checkpoint }) => {
+  //   return {
+  //     description: checkpoint.description,
+  //     meeting_place: checkpoint.meeting_place,
+  //     opening_date: checkpoint.opening_date,
+  //   };
+  // });
 
-  const comments = checkpointAndComments?.map(({ comments }) => {
-    return comments.map(({ author, text }) => {
-      return {
-        author: author.name,
-        text: text,
-      };
-    });
-  });
+  // const comments = data?.map(({ comments }) => {
+  //   return comments.map(({ author, text }) => {
+  //     return {
+  //       author: author.name,
+  //       text: text,
+  //     };
+  //   });
+  // });
 
-  const checkpointCommentsCSV = comments?.map((cmt, index) => {
-    return {
-      ...checkpoint[index],
-      authors: cmt.map(({ author }) => author),
-      texts: cmt.map(({ text }) => text),
-    };
-  });
+  // const checkpointCommentsCSV = comments?.map((cmt, index) => {
+  //   return {
+  //     ...checkpoint[index],
+  //     authors: cmt.map(({ author }) => author),
+  //     texts: cmt.map(({ text }) => text),
+  //   };
+  // });
 
   return (
     <Box display="flex" justifyContent="flex-end">
       <CSVLink
-        data={checkpointCommentsCSV}
+        data={data}
         headers={headers}
         filename="strateegia_conversation_points_report-csv.csv"
       >
@@ -85,7 +80,7 @@ export function ExportsButtons({ checkpointAndComments }) {
           bg: "#5C636A",
         }}
         paddingBottom={"4px"}
-        onClick={() => exportJSONData(checkpointCommentsCSV)}
+        onClick={() => exportJSONData(data)}
       >
         json
       </Button>
