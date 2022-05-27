@@ -88,19 +88,7 @@ export default function Main() {
           selectedProject
         );
         setCommentsReport({ ...response2 });
-        setRawData([
-          ...response2.raw.sort(function (a, b) {
-            const nameA = a.toUpperCase(); // ignore upper and lowercase
-            const nameB = b.toUpperCase(); // ignore upper and lowercase
-            if (nameA < nameB) {
-              return -1;
-            }
-            if (nameA > nameB) {
-              return 1;
-            }
-            return 0;
-          }),
-        ]);
+        setRawData([...response2.raw.sort((a, b) => sortString(a, b))]);
       } catch (error) {
         console.log(error);
       }
@@ -169,8 +157,8 @@ export default function Main() {
               json
             </Button>
           </Flex>
-          <TableContainer mt={3}>
-            <Table id={"table_output"} variant={"striped"}>
+          <TableContainer mt={3} maxWidth={"50%"}>
+            <Table id={"table_output"} variant={"striped"} size={"sm"}>
               <Thead>
                 <Tr>
                   <Th>usuário</Th>
@@ -180,16 +168,18 @@ export default function Main() {
                 </Tr>
               </Thead>
               <Tbody>
-                {commentsReport?.counter.map((comment) => {
-                  return (
-                    <Tr key={comment.user}>
-                      <Td>{comment.user}</Td>
-                      <Td>{comment.comments || 0}</Td>
-                      <Td>{comment.replies || 0}</Td>
-                      <Td>{comment.agreements || 0}</Td>
-                    </Tr>
-                  );
-                })}
+                {commentsReport?.counter
+                  .sort((a, b) => sortString(a.user, b.user))
+                  .map((comment) => {
+                    return (
+                      <Tr key={comment.user}>
+                        <Td>{comment.user}</Td>
+                        <Td>{comment.comments || 0}</Td>
+                        <Td>{comment.replies || 0}</Td>
+                        <Td>{comment.agreements || 0}</Td>
+                      </Tr>
+                    );
+                  })}
               </Tbody>
             </Table>
           </TableContainer>
@@ -201,4 +191,16 @@ export default function Main() {
       )}
     </Box>
   );
+}
+
+function sortString(a, b) {
+  const nameA = a.toUpperCase(); // ignore upper and lowercase
+  const nameB = b.toUpperCase(); // ignore upper and lowercase
+  if (nameA < nameB) {
+    return -1;
+  }
+  if (nameA > nameB) {
+    return 1;
+  }
+  return 0;
 }
