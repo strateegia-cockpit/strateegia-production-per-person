@@ -195,7 +195,7 @@ export async function extractUserCommentInfo(accessToken, projectId) {
     }
   });
   console.log("fullLinks %o", fullLinks);
-  const onlyUsers = fullLinks.filter(item => item.source.group === 'user');
+  const onlyUsers = fullLinks.filter(item => item?.source?.group === 'user');
   console.log("onlyUsers %o", onlyUsers);
   const limpando = onlyUsers.map(item => { return `${item.source.title},${item.target.group},${item.target.title}` });
   console.log("limpando %o", limpando);
@@ -214,5 +214,5 @@ export async function extractUserCommentInfo(accessToken, projectId) {
   });
   console.log("counter %o", counter);
   console.log("rollup %o", rollup);
-  return counter;
+  return { raw: limpando, counter: counter };
 }

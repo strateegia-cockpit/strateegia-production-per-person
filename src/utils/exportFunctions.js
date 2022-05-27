@@ -40,3 +40,16 @@ export function exportTableAsCsv(table_id, separator = ',') {
   link.click();
   document.body.removeChild(link);
 }
+
+export function exportJson(dataElement) {
+  let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataElement));
+  let link = document.createElement('a');
+  link.style.display = 'none';
+  link.setAttribute('target', '_blank');
+  // link_svg.href = url;
+  link.setAttribute("href", dataStr);
+  link.setAttribute("download", "data.json");
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}

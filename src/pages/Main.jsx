@@ -10,6 +10,7 @@ import {
   Tr,
   Button,
   Flex,
+  Text,
 } from "@chakra-ui/react";
 import { useEffect, useState, Fragment } from "react";
 import * as api from "strateegia-api";
@@ -18,8 +19,7 @@ import MapList from "../components/MapList";
 import ProjectList from "../components/ProjectList";
 import { extractUserCommentInfo } from "../data/graphData";
 import * as d3 from "d3";
-import { ExportsButtons } from "../components/ExportsButtons";
-import { exportTableAsCsv } from "../utils/exportFunctions";
+import { exportTableAsCsv, exportJson } from "../utils/exportFunctions";
 
 export default function Main() {
   const [selectedProject, setSelectedProject] = useState("");
@@ -28,6 +28,7 @@ export default function Main() {
   const [isLoading, setIsLoading] = useState(false);
   const [accessToken, setAccessToken] = useState("");
   const [commentsReport, setCommentsReport] = useState(null);
+  const [rawData, setRawData] = useState(null);
 
   const handleSelectChange = (e) => {
     setSelectedProject(e.target.value);
@@ -86,7 +87,20 @@ export default function Main() {
           accessToken,
           selectedProject
         );
-        setCommentsReport([...response2]);
+        setCommentsReport({ ...response2 });
+        setRawData([
+          ...response2.raw.sort(function (a, b) {
+            const nameA = a.toUpperCase(); // ignore upper and lowercase
+            const nameB = b.toUpperCase(); // ignore upper and lowercase
+            if (nameA < nameB) {
+              return -1;
+            }
+            if (nameA > nameB) {
+              return 1;
+            }
+            return 0;
+          }),
+        ]);
       } catch (error) {
         console.log(error);
       }
@@ -136,9 +150,27 @@ export default function Main() {
             >
               csv
             </Button>
+            <Button
+              size="xs"
+              fontSize="14px"
+              fontWeight="400"
+              bg="#6c757d"
+              color="#fff"
+              borderRadius="3px"
+              _hover={{
+                bg: "#5C636A",
+              }}
+              paddingBottom={"4px"}
+              marginStart={1}
+              onClick={() => {
+                exportJson(rawData);
+              }}
+            >
+              json
+            </Button>
           </Flex>
           <TableContainer mt={3}>
-            <Table id={"table_output"}>
+            <Table id={"table_output"} variant={"striped"}>
               <Thead>
                 <Tr>
                   <Th>usuário</Th>
@@ -148,7 +180,7 @@ export default function Main() {
                 </Tr>
               </Thead>
               <Tbody>
-                {commentsReport?.map((comment) => {
+                {commentsReport?.counter.map((comment) => {
                   return (
                     <Tr key={comment.user}>
                       <Td>{comment.user}</Td>
@@ -161,8 +193,10 @@ export default function Main() {
               </Tbody>
             </Table>
           </TableContainer>
-
-          <pre>{JSON.stringify(commentsReport, null, 2)}</pre>
+          <Heading as={"h3"} size={"md"} mt={3}>
+            dados brutos
+          </Heading>
+          <pre>{JSON.stringify(rawData, null, 2)}</pre>
         </Fragment>
       )}
     </Box>
