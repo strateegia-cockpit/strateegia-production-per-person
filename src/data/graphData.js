@@ -203,7 +203,8 @@ export async function extractUserCommentInfo(accessToken, projectId) {
   const output = limpando.map(item => { return { user: item.split(',')[0], action: item.split(',')[1] } });
   const auxCounter = d3.group(output, d => d.user, d => d.action);
   console.log("auxCounter %o", auxCounter);
-  const counter = Array.from(auxCounter, ([key, values]) => {
+  const rollup = d3.rollup(output, v => v.length, d => d.user, d => d.action);
+  const counter = Array.from(rollup, ([key, values]) => {
     return {
       user: key,
       comments: values.get("comment"),
@@ -212,5 +213,6 @@ export async function extractUserCommentInfo(accessToken, projectId) {
     }
   });
   console.log("counter %o", counter);
-  return limpando;
+  console.log("rollup %o", rollup);
+  return counter;
 }
