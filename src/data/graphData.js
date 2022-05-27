@@ -196,8 +196,9 @@ export async function extractUserCommentInfo(accessToken, projectId) {
   });
   console.log("fullLinks %o", fullLinks);
   const onlyUsers = fullLinks.filter(item => item.source.group === 'user');
-  const limpando = onlyUsers.map(item => { return `${item.source.title},${item.target.group}` });
-  console.log("author,item");
+  console.log("onlyUsers %o", onlyUsers);
+  const limpando = onlyUsers.map(item => { return `${item.source.title},${item.target.group},${item.target.title}` });
+  console.log("limpando %o", limpando);
   // limpando.forEach(d => console.log(d));
   const output = limpando.map(item => { return { user: item.split(',')[0], action: item.split(',')[1] } });
   const auxCounter = d3.group(output, d => d.user, d => d.action);
@@ -211,5 +212,5 @@ export async function extractUserCommentInfo(accessToken, projectId) {
     }
   });
   console.log("counter %o", counter);
-  return auxCounter;
+  return limpando;
 }
