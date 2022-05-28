@@ -157,7 +157,7 @@ export default function Main() {
               json
             </Button>
           </Flex>
-          <TableContainer mt={3} maxWidth={"50%"}>
+          <TableContainer mt={3}>
             <Table id={"table_output"} variant={"striped"} size={"sm"}>
               <Thead>
                 <Tr>
