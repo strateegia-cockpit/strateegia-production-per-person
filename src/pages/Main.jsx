@@ -20,6 +20,7 @@ import ProjectList from "../components/ProjectList";
 import { extractUserCommentInfo } from "../data/graphData";
 import * as d3 from "d3";
 import { exportTableAsCsv, exportJson } from "../utils/exportFunctions";
+import { i18n } from "../translate/i18n";
 
 export default function Main() {
   const [selectedProject, setSelectedProject] = useState("");
@@ -104,7 +105,7 @@ export default function Main() {
   return (
     <Box padding={10}>
       <Heading as="h3" size="md" mb={3}>
-        relatório de comentários
+        {i18n.t('main.heading')}
       </Heading>
       <ProjectList handleSelectChange={handleSelectChange} />
       {/* <MapList

@@ -4,16 +4,15 @@ import {
   Flex,
   FormControl,
   FormLabel,
-  Heading,
   Input,
   Stack,
-  Text,
   useColorModeValue,
 } from "@chakra-ui/react";
 import { auth } from "strateegia-api";
-import { ColorModeSwitcher } from "../ColorModeSwitcher";
+// import { ColorModeSwitcher } from "../ColorModeSwitcher";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { i18n } from "../translate/i18n";
 
 export default function Signin() {
   const navigate = useNavigate();
@@ -71,11 +70,11 @@ export default function Signin() {
           <form onSubmit={handleSubmit} id="login-form">
             <Stack spacing={4}>
               <FormControl id="email">
-                <FormLabel>seu login em strateegia</FormLabel>
+                <FormLabel>{i18n.t('login.label1')}</FormLabel>
                 <Input type="email" name="email" onChange={handleChange} />
               </FormControl>
               <FormControl id="password">
-                <FormLabel>sua senha em strateegia</FormLabel>
+                <FormLabel>{i18n.t('login.label2')}</FormLabel>
                 <Input
                   type="password"
                   name="password"
@@ -91,7 +90,7 @@ export default function Signin() {
                   }}
                   type="submit"
                 >
-                  entrar
+                  {i18n.t('login.button')}
                 </Button>
               </Stack>
             </Stack>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Select } from '@chakra-ui/react';
+import { i18n } from "../translate/i18n";
 import * as api from 'strateegia-api';
 
 export default function ProjectList({ handleSelectChange }) {
@@ -20,7 +21,7 @@ export default function ProjectList({ handleSelectChange }) {
   }, []);
 
   return (
-    <Select placeholder="escolha o projeto" onChange={handleSelectChange}>
+    <Select placeholder={i18n.t('main.placeholder')}  onChange={handleSelectChange}>
       {projectList.map(lab => {
         return lab.projects.map(project => {
           return (
