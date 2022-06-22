@@ -9,7 +9,7 @@ export function ExportsButtons({ project, data, rawData, saveFile }) {
       <ButtonExp click={saveFile} project={project} text='docx'/>
       <CSVLink
         data={data}
-        filename="strateegia_influential_report-csv.csv"
+        filename="strateegia_production_per_person_report-csv.csv"
       >
         <ButtonExp click={null} project={project} text='csv'/>
       </CSVLink>
@@ -25,7 +25,7 @@ export const exportJSONData = (data) => {
 
   const link = document.createElement("a");
   link.href = jsonString;
-  link.download = "strateegia_influential_report-json.json";
+  link.download = "strateegia_production_per_person_report-json.json";
 
   link.click();
 };

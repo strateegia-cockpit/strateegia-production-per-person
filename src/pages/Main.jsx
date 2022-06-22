@@ -22,6 +22,7 @@ import { exportTableAsCsv, exportJson } from "../utils/exportFunctions";
 import { i18n } from "../translate/i18n";
 import { ExportsButtons } from "../components/ExportsButtons";
 import UserTable from "../components/UserTable";
+import { generateDocument } from "../components/FileContent";
 
 export default function Main() {
   const [selectedProject, setSelectedProject] = useState("");
@@ -118,7 +119,7 @@ export default function Main() {
         mapId={selectedMap}
         handleSelectChange={handleDivPointSelectChange}
       /> */}
-      <ExportsButtons data={commentsReport?.counter || ''} rawData={rawData} saveFile={() => console.log('oi')} project={rawData}/>
+      <ExportsButtons data={commentsReport?.counter || ''} rawData={rawData} saveFile={() => generateDocument(commentsReport)} project={rawData}/>
       <Loading active={isLoading} />
       <Heading as="h3" size="lg" mb={12} mt={3}>
         {i18n.t('main.heading')}
