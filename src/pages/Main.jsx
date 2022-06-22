@@ -20,6 +20,8 @@ import ProjectList from "../components/ProjectList";
 import { extractUserCommentInfo } from "../data/graphData";
 import { exportTableAsCsv, exportJson } from "../utils/exportFunctions";
 import { i18n } from "../translate/i18n";
+import { ExportsButtons } from "../components/ExportsButtons";
+import UserTable from "../components/UserTable";
 
 export default function Main() {
   const [selectedProject, setSelectedProject] = useState("");
@@ -61,40 +63,9 @@ export default function Main() {
   }, [selectedProject]);
 
   useEffect(() => {
-    setSelectedDivPoint("");
     async function fetchData() {
       setIsLoading(true);
       try {
-        // const response = await api.getMapById(accessToken, selectedMap);
-        // const divPointsRequest = [];
-        // response?.points
-        //   ?.filter((point) => point.point_type === "DIVERGENCE")
-        //   .forEach((divPoint) => {
-        //     console.log(divPoint.title);
-        //     divPointsRequest.push(
-        //       api
-        //         .getDivergencePointById(accessToken, divPoint.id)
-        //         .then((divPointRes) => {
-        //           return api
-        //             .getCommentsGroupedByQuestionReport(
-        //               accessToken,
-        //               divPoint.id
-        //             )
-        //             .then((res) => {
-        //               return {
-        //                 divPoint: divPointRes,
-        //                 commentsByQuestion: res,
-        //               };
-        //             });
-        //         })
-        //     );
-        //   });
-        // const divPointsResponse = await Promise.all(divPointsRequest);
-        // console.log("divPoints %o", divPointsResponse);
-        // setCommentsReport([...divPointsResponse]);
-        // console.log("mapDetails: %o", response);
-        // [TODO] - use the access token to fetch the data
-        // [TODO] - add the fetch data function here
         const response2 = await extractUserCommentInfo(
           accessToken,
           selectedProject
@@ -113,11 +84,14 @@ export default function Main() {
     setAccessToken(localStorage.getItem("accessToken"));
   }, []);
 
+  useEffect(() => {
+
+    console.log("🚀 ~ file: Main.jsx ~ line 90 ~ Main ~ rawData", rawData)
+    console.log("🚀 ~ file: Main.jsx ~ line 91 ~ Main ~ commentsReport", commentsReport)
+  }, [commentsReport])
+
   return (
     <Box padding={10}>
-      <Heading as="h3" size="md" mb={3}>
-        {i18n.t('main.heading')}
-      </Heading>
       <Box display='flex' >
         <ProjectList handleSelectChange={handleSelectChange} />
         <Link 
@@ -144,13 +118,15 @@ export default function Main() {
         mapId={selectedMap}
         handleSelectChange={handleDivPointSelectChange}
       /> */}
+      <ExportsButtons data={commentsReport?.counter || ''} rawData={rawData} saveFile={() => console.log('oi')} project={rawData}/>
       <Loading active={isLoading} />
-
-      {/* [TODO] Add you component here */}
+      <Heading as="h3" size="lg" mb={12} mt={3}>
+        {i18n.t('main.heading')}
+      </Heading>
       {commentsReport && (
         <Fragment>
           <Flex mt={2} justify={"end"}>
-            <Button
+            {/* <Button
               size="xs"
               fontSize="14px"
               fontWeight="400"
@@ -184,9 +160,10 @@ export default function Main() {
               }}
             >
               json
-            </Button>
+            </Button> */}
           </Flex>
-          <TableContainer mt={3}>
+          <UserTable accessToken={accessToken} selectedProject={selectedProject}/>
+          {/* <TableContainer mt={3}>
             <Table id={"table_output"} variant={"striped"} size={"sm"}>
               <Thead>
                 <Tr>
@@ -211,11 +188,11 @@ export default function Main() {
                   })}
               </Tbody>
             </Table>
-          </TableContainer>
-          <Heading as={"h3"} size={"md"} mt={3}>
+          </TableContainer> */}
+          {/* <Heading as={"h3"} size={"md"} mt={3}>
             dados brutos
           </Heading>
-          <pre>{JSON.stringify(rawData, null, 2)}</pre>
+          <pre>{JSON.stringify(rawData, null, 2)}</pre> */}
         </Fragment>
       )}
     </Box>

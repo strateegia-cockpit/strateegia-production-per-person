@@ -11,27 +11,16 @@ const messages = {
                 heading: 'produção por pessoa', 
                 placeholder: 'escolha o projeto', 
                 placeholderMap: 'escolha o mapa', 
-
-                p1p4p7p11_1: 'índice de ',
-                p1_2: 'na jornada ',
-                p1bold1: 'pessoas ativas ', 
-                p2: 'pessoas ',
-                p3: 'pessoas inativas ',
-                p4p7p11_3: 'da jornada ',
-                p4bold1: 'engajamento nas questões ', 
-                p5: 'questões ', 
-                p6_1: 'respostas ',
-                p6p10_2: ' de ',
-                p6p10_3: ' esperadas',
-                p7bold: 'engajamento nos debates ',
-                p8: 'comentários ',
-                p9: 'concordar ',
-                p10_1: 'interações ',
-                p11bold: 'engajamento nas divergências ' 
             },
-            mapList: {
+            userTable: {
+                th2: 'respostas',
+                th3: 'comentários',
+                th4: 'curtidas',
+            },
+            selector: {
                 list: 'todos'
             }
+
         }
     }
 };

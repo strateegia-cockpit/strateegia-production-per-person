@@ -11,7 +11,6 @@ export default function ProjectList({ handleSelectChange }) {
       try {
         const accessToken = localStorage.getItem('accessToken');
         const projectList = await api.getAllProjects(accessToken);
-        // console.log('projectList: %o', projectList);
         setProjectList(projectList);
       } catch (error) {
         console.log(error);
