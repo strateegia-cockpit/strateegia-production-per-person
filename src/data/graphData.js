@@ -14,8 +14,8 @@ const gatherPoints = async (accessToken, projectId, mapId) => {
 
 const getComments = async (accessToken, divPointId) => {
   const comments = await Promise.all(
-    divPointId.map( async ({id}) => {
-      const data = await api.getCommentsGroupedByQuestionReport(accessToken, id);
+    divPointId?.map( async ({value}) => {
+      const data = await api.getCommentsGroupedByQuestionReport(accessToken, value);
       const getOnlyComments = await data.map(({comments}) => comments);
       return getOnlyComments.flat();
     })
@@ -30,14 +30,10 @@ const getCount = (arrayToReduce) => {
   return count;
 };
 
-const createUsersList = (usersCommentsCount) => {
-  
-};
-
 export async function gatherData(accessToken, projectId, mapId, divPointId) {
   const data = await gatherPoints(accessToken, projectId, mapId);
 
-  const comments = await getComments(accessToken, divPointId || data[0]);
+  const comments = await getComments(accessToken, divPointId);
   
   const replies = comments.map(({ replies }) => {
     return replies;

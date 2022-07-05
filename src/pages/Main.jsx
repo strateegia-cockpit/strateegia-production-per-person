@@ -12,7 +12,7 @@ import MapList from "../components/MapList";
 import ProjectList from "../components/ProjectList";
 import DivPointList from "../components/DivPointList";
 import { extractUserCommentInfo, gatherData } from "../data/graphData";
-import { exportTableAsCsv, exportJson, sortString } from "../utils/exportFunctions";
+import { sortString } from "../utils/exportFunctions";
 import { i18n } from "../translate/i18n";
 import { ExportsButtons } from "../components/ExportsButtons";
 import UserTable from "../components/UserTable";
@@ -51,7 +51,7 @@ export default function Main() {
 
   const handleDivPointSelectChange = (value) => {
     setSelectedDivPoint(value);
-    // gatherData(accessToken, selectedProject, selectedMap, e.target.value);
+    gatherData(accessToken, selectedProject, selectedMap, value);
   };
 
   useEffect(() => {
@@ -60,23 +60,23 @@ export default function Main() {
     setSelectedDivPoint("");
   }, [selectedProject]);
 
-  useEffect(() => {
-    async function fetchData() {
-      setIsLoading(true);
-      try {
-        const response2 = await extractUserCommentInfo(
-          accessToken,
-          selectedProject
-        );
-        setCommentsReport({ ...response2 });
-        setRawData([...response2.raw.sort((a, b) => sortString(a, b))]);
-      } catch (error) {
-        console.log(error);
-      }
-      setIsLoading(false);
-    }
-    fetchData();
-  }, [selectedProject]);
+  // useEffect(() => {
+  //   async function fetchData() {
+  //     setIsLoading(true);
+  //     try {
+  //       const response2 = await extractUserCommentInfo(
+  //         accessToken,
+  //         selectedProject
+  //       );
+  //       setCommentsReport({ ...response2 });
+  //       setRawData([...response2.raw.sort((a, b) => sortString(a, b))]);
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //     setIsLoading(false);
+  //   }
+  //   fetchData();
+  // }, [selectedProject]);
 
   useEffect(() => {
     setAccessToken(localStorage.getItem("accessToken"));
@@ -115,7 +115,7 @@ export default function Main() {
       <Heading as="h3" size="lg" mb={12} mt={3}>
         {i18n.t('main.heading')}
       </Heading>
-      {commentsReport && (
+      {selectedDivPoint && (
         <Fragment>
           <Flex mt={2} justify={"end"}>
           </Flex>

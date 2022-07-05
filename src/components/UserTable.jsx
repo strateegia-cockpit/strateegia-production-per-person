@@ -60,8 +60,9 @@ const UserTable = ({accessToken, selectedProject, selectedMap, selectedDivPoint}
         //   setIsLoading(false);
         }
         fetchData();
-      }, [selectedMap, selectedDivPoint]);
+      }, [selectedDivPoint]);
 
+   
 
     return (
         <Table variant='striped' w='60vw'>
@@ -83,7 +84,7 @@ const UserTable = ({accessToken, selectedProject, selectedMap, selectedDivPoint}
                             {comment.name}
                         </Td>
                         <Td key={comment.name+comment.comments} textAlign='center'>{comment.comments || 0}</Td>
-                        <Td key={comment.replies+comment.name} textAlign='center'>{comment.replies || 0}</Td>
+                        <Td key={comment.answers+comment.name} textAlign='center'>{comment.answers || 0}</Td>
                         <Td key={comment.name+comment.agreements+comment.user} textAlign='center'>{comment.agreements || 0}</Td>
                     </Tr>
                 );
