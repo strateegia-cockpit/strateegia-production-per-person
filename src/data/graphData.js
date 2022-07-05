@@ -1,6 +1,68 @@
 import * as api from "strateegia-api";
 import * as d3 from 'd3';
 
+const gatherPoints = async (accessToken, projectId, mapId) => {
+  const map = await Promise.all(
+    mapId.map( async ({value}) => {
+      const {points} = await api.getMapById(accessToken, value);
+      return points;
+    })
+  )
+  const project = await api.getProjectById(accessToken, projectId);
+  return [map.flat(), project];
+};
+
+const getComments = async (accessToken, divPointId) => {
+  const comments = await Promise.all(
+    divPointId.map( async ({id}) => {
+      const data = await api.getCommentsGroupedByQuestionReport(accessToken, id);
+      const getOnlyComments = await data.map(({comments}) => comments);
+      return getOnlyComments.flat();
+    })
+  )
+  return comments.flat();
+};
+
+const getCount = (arrayToReduce) => {
+    const count = arrayToReduce.reduce((acc, {author} ) => {        
+        return { ...acc, [author.id]: (acc[author.id] || 0) + 1}
+    }, []);  
+  return count;
+};
+
+const createUsersList = (usersCommentsCount) => {
+  
+};
+
+export async function gatherData(accessToken, projectId, mapId, divPointId) {
+  const data = await gatherPoints(accessToken, projectId, mapId);
+
+  const comments = await getComments(accessToken, divPointId || data[0]);
+  
+  const replies = comments.map(({ replies }) => {
+    return replies;
+  });
+  const agreements = comments.map(({ agreements }) => {
+    return agreements;
+  });
+
+  const usersCommentsCount = getCount(comments);
+  const usersAnswersCount = getCount(replies.flat());
+  const usersAgreementsCount = agreements.flat().reduce((acc, {user_id}) => {        
+    return { ...acc, [user_id]: (acc[user_id] || 0) + 1 }
+  }, []);  
+  
+  const users = data[1].users.map(({name, id}) => {
+    return {name: name, id: id}
+  });
+
+  const usersForUserTable = users.map(user => {
+      return [{...user, 'comments': usersCommentsCount[user['id']] || 0, 'answers': usersAnswersCount[user['id']] || 0, 'agreements': usersAgreementsCount[user['id']] || 0 }];
+  });
+
+  return usersForUserTable.flat();
+}
+
 export async function gatherGraphData(accessToken, projectId, mode) {
 
   const cData = {
@@ -182,27 +244,30 @@ export async function gatherGraphData(accessToken, projectId, mode) {
       });
     });
   });
-  console.log(cData);
+  // console.log(cData);
   return cData;
 }
 
-export async function extractUserCommentInfo(accessToken, projectId) {
+export async function extractUserCommentInfo(accessToken, projectId = undefined, mapId = undefined, divPoint = undefined ) {
+  
   const cData = await gatherGraphData(accessToken, projectId, "usuário");
+  // console.log("🚀 ~ file: graphData.js ~ line 192 ~ extractUserCommentInfo ~ cData", cData)
   const fullLinks = cData.links.map(link => {
     return {
       source: cData.nodes.find(node => node.id === link.source),
       target: cData.nodes.find(node => node.id === link.target)
     }
   });
-  console.log("fullLinks %o", fullLinks);
+  // console.log("🚀 ~ file: graphData.js ~ line 199 ~ extractUserCommentInfo ~ fullLinks", fullLinks)
+  // console.log("fullLinks %o", fullLinks);
   const onlyUsers = fullLinks.filter(item => item?.source?.group === 'user');
-  console.log("onlyUsers %o", onlyUsers);
+  // console.log("onlyUsers %o", onlyUsers);
   const limpando = onlyUsers.map(item => { return `${item.source.title},${item.target.group},${item.target.title}` });
-  console.log("limpando %o", limpando);
+  // console.log("limpando %o", limpando);
   // limpando.forEach(d => console.log(d));
   const output = limpando.map(item => { return { user: item.split(',')[0], action: item.split(',')[1] } });
   const auxCounter = d3.group(output, d => d.user, d => d.action);
-  console.log("auxCounter %o", auxCounter);
+  // console.log("auxCounter %o", auxCounter);
   const rollup = d3.rollup(output, v => v.length, d => d.user, d => d.action);
   const counter = Array.from(rollup, ([key, values]) => {
     return {
@@ -212,7 +277,7 @@ export async function extractUserCommentInfo(accessToken, projectId) {
       agreements: values.get("agreement")
     }
   });
-  console.log("counter %o", counter);
-  console.log("rollup %o", rollup);
+  // console.log("counter %o", counter);
+  // console.log("rollup %o", rollup);
   return { raw: limpando, counter: counter };
 }

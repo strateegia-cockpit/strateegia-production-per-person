@@ -1,14 +1,7 @@
 import {
   Box,
   Heading,
-  Table,
-  TableContainer,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
-  Button,
+
   Flex,
   Link,
 } from "@chakra-ui/react";
@@ -17,12 +10,13 @@ import * as api from "strateegia-api";
 import Loading from "../components/Loading";
 import MapList from "../components/MapList";
 import ProjectList from "../components/ProjectList";
-import { extractUserCommentInfo } from "../data/graphData";
-import { exportTableAsCsv, exportJson } from "../utils/exportFunctions";
+import DivPointList from "../components/DivPointList";
+import { extractUserCommentInfo, gatherData } from "../data/graphData";
+import { exportTableAsCsv, exportJson, sortString } from "../utils/exportFunctions";
 import { i18n } from "../translate/i18n";
 import { ExportsButtons } from "../components/ExportsButtons";
 import UserTable from "../components/UserTable";
-import { generateDocument } from "../components/FileContent";
+import { generateDocument } from "../components/FileContent"; 
 
 export default function Main() {
   const [selectedProject, setSelectedProject] = useState("");
@@ -47,14 +41,17 @@ export default function Main() {
       }
     }
     fetchProjectData();
+    // gatherData(accessToken, e.target.value);
   };
 
-  const handleMapSelectChange = (e) => {
-    setSelectedMap(e.target.value);
+  const handleMapSelectChange = (value) => {
+    setSelectedMap(value);
+    gatherData(accessToken, selectedProject, value);
   };
 
-  const handleDivPointSelectChange = (e) => {
-    setSelectedDivPoint(e.target.value);
+  const handleDivPointSelectChange = (value) => {
+    setSelectedDivPoint(value);
+    // gatherData(accessToken, selectedProject, selectedMap, e.target.value);
   };
 
   useEffect(() => {
@@ -85,12 +82,6 @@ export default function Main() {
     setAccessToken(localStorage.getItem("accessToken"));
   }, []);
 
-  useEffect(() => {
-
-    console.log("🚀 ~ file: Main.jsx ~ line 90 ~ Main ~ rawData", rawData)
-    console.log("🚀 ~ file: Main.jsx ~ line 91 ~ Main ~ commentsReport", commentsReport)
-  }, [commentsReport])
-
   return (
     <Box padding={10}>
       <Box display='flex' >
@@ -111,14 +102,14 @@ export default function Main() {
           {i18n.t('main.link')}
         </Link>
       </Box>
-      {/* <MapList
+      <MapList
         projectId={selectedProject}
         handleSelectChange={handleMapSelectChange}
-      /> */}
-      {/* <DivPointList
+      />
+      <DivPointList
         mapId={selectedMap}
         handleSelectChange={handleDivPointSelectChange}
-      /> */}
+      />
       <ExportsButtons data={commentsReport?.counter || ''} rawData={rawData} saveFile={() => generateDocument(commentsReport)} project={rawData}/>
       <Loading active={isLoading} />
       <Heading as="h3" size="lg" mb={12} mt={3}>
@@ -127,87 +118,12 @@ export default function Main() {
       {commentsReport && (
         <Fragment>
           <Flex mt={2} justify={"end"}>
-            {/* <Button
-              size="xs"
-              fontSize="14px"
-              fontWeight="400"
-              bg="#6c757d"
-              color="#fff"
-              borderRadius="3px"
-              _hover={{
-                bg: "#5C636A",
-              }}
-              paddingBottom={"4px"}
-              onClick={() => {
-                exportTableAsCsv("table_output", ",");
-              }}
-            >
-              csv
-            </Button>
-            <Button
-              size="xs"
-              fontSize="14px"
-              fontWeight="400"
-              bg="#6c757d"
-              color="#fff"
-              borderRadius="3px"
-              _hover={{
-                bg: "#5C636A",
-              }}
-              paddingBottom={"4px"}
-              marginStart={1}
-              onClick={() => {
-                exportJson(rawData);
-              }}
-            >
-              json
-            </Button> */}
           </Flex>
-          <UserTable accessToken={accessToken} selectedProject={selectedProject}/>
-          {/* <TableContainer mt={3}>
-            <Table id={"table_output"} variant={"striped"} size={"sm"}>
-              <Thead>
-                <Tr>
-                  <Th>usuário</Th>
-                  <Th>respostas às questões</Th>
-                  <Th>comentários às respostas</Th>
-                  <Th>concordâncias</Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                {commentsReport?.counter
-                  .sort((a, b) => sortString(a.user, b.user))
-                  .map((comment) => {
-                    return (
-                      <Tr key={comment.user}>
-                        <Td>{comment.user}</Td>
-                        <Td>{comment.comments || 0}</Td>
-                        <Td>{comment.replies || 0}</Td>
-                        <Td>{comment.agreements || 0}</Td>
-                      </Tr>
-                    );
-                  })}
-              </Tbody>
-            </Table>
-          </TableContainer> */}
-          {/* <Heading as={"h3"} size={"md"} mt={3}>
-            dados brutos
-          </Heading>
-          <pre>{JSON.stringify(rawData, null, 2)}</pre> */}
+          <UserTable accessToken={accessToken} selectedProject={selectedProject} selectedMap={selectedMap} selectedDivPoint={selectedDivPoint}/>
         </Fragment>
       )}
     </Box>
   );
 }
 
-function sortString(a, b) {
-  const nameA = a.toUpperCase(); // ignore upper and lowercase
-  const nameB = b.toUpperCase(); // ignore upper and lowercase
-  if (nameA < nameB) {
-    return -1;
-  }
-  if (nameA > nameB) {
-    return 1;
-  }
-  return 0;
-}
+

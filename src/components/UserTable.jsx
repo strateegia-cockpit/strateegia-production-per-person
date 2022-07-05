@@ -8,7 +8,7 @@ import {
     Td, 
 } from '@chakra-ui/react';
 import { i18n } from "../translate/i18n";
-import { extractUserCommentInfo } from "../data/graphData"; 
+import { gatherData } from "../data/graphData"; 
 
 export const THeader = ({text, weight, alignment, width}) => {
     return (
@@ -38,7 +38,7 @@ function sortString(a, b) {
     return 0;
 }
 
-const UserTable = ({accessToken, selectedProject}) => {
+const UserTable = ({accessToken, selectedProject, selectedMap, selectedDivPoint}) => {
     const [commentsReport, setCommentsReport] = React.useState(null);
     const [rawData, setRawData] = React.useState(null);
 
@@ -46,20 +46,22 @@ const UserTable = ({accessToken, selectedProject}) => {
         async function fetchData() {
         //   setIsLoading(true);
           try {
-            const response2 = await extractUserCommentInfo(
+            const response2 = await gatherData(
               accessToken,
-              selectedProject
+              selectedProject,
+              selectedMap,
+              selectedDivPoint
             );
-            setCommentsReport({ ...response2 });
-            setRawData([...response2.raw.sort((a, b) => sortString(a, b))]);
+            setCommentsReport(response2);
+            // setRawData([...response2.raw.sort((a, b) => sortString(a, b))]);
           } catch (error) {
             console.log(error);
           }
         //   setIsLoading(false);
         }
         fetchData();
-      }, [selectedProject]);
-   
+      }, [selectedMap, selectedDivPoint]);
+
 
     return (
         <Table variant='striped' w='60vw'>
@@ -73,17 +75,16 @@ const UserTable = ({accessToken, selectedProject}) => {
             </Tr>
             </Thead>
             <Tbody>
-            {commentsReport?.counter
-                  .sort((a, b) => sortString(a.user, b.user))
+            {commentsReport?.sort((a, b) => sortString(a['name'], b['name']))
                   .map((comment, i) => {
                     return (
-                    <Tr key={comment.user}>
-                        <Td key={comment.user+i} textTransform='lowercase'> 
-                            {comment.user}
+                    <Tr key={i}>
+                        <Td key={comment.name} textTransform='lowercase'> 
+                            {comment.name}
                         </Td>
-                        <Td key={comment.comments} textAlign='center'>{comment.comments || 0}</Td>
-                        <Td key={comment.replies} textAlign='center'>{comment.replies || 0}</Td>
-                        <Td key={comment.agreements} textAlign='center'>{comment.agreements || 0}</Td>
+                        <Td key={comment.name+comment.comments} textAlign='center'>{comment.comments || 0}</Td>
+                        <Td key={comment.replies+comment.name} textAlign='center'>{comment.replies || 0}</Td>
+                        <Td key={comment.name+comment.agreements+comment.user} textAlign='center'>{comment.agreements || 0}</Td>
                     </Tr>
                 );
             })}

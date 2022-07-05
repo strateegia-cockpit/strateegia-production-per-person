@@ -11,6 +11,7 @@ const messages = {
                 heading: 'produção por pessoa', 
                 placeholder: 'escolha o projeto', 
                 placeholderMap: 'escolha o mapa', 
+                placeholderDiv: 'escolha o ponto de divergência', 
             },
             userTable: {
                 th2: 'respostas',
