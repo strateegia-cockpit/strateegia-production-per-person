@@ -89,7 +89,6 @@ const UserTable = ({accessToken, selectedProject, selectedMap, selectedDivPoint}
                     </Tr>
                 );
             })}
-            
             </Tbody>
         </Table>
     )
