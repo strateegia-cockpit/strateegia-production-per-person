@@ -6,10 +6,10 @@ export const StatisticsTable = ({ commentsReport }) => {
   const [reportLists, setReportLists] = useState(null);
 
   useEffect(() => {
-    console.log(commentsReport);
-    if (commentsReport) {
-      const commentsList = commentsReport.map((d) => d.comments || 0);
-      const repliesList = commentsReport.map((d) => d.answers || 0);
+    const filteredUsers = commentsReport ? commentsReport.filter(user => user !== undefined && user !== 'empty') : commentsReport
+    if (filteredUsers) {
+      const commentsList = filteredUsers.map((d) => d.comments || 0);
+      const repliesList = filteredUsers.map((d) => d.answers || 0);
       const commentsListMean = mean(commentsList);
       const commentsListStDev = stdev(commentsList);
       const commentsListEquilibriumIndex =
@@ -29,7 +29,7 @@ export const StatisticsTable = ({ commentsReport }) => {
         repliesListEquilibriumIndex,
         totalEquilibriumIndex,
       };
-      console.log("output %o", outputLists);
+      // console.log("output %o", outputLists);
       setReportLists({ ...outputLists });
     } else {
       setReportLists(null);
