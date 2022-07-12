@@ -3,8 +3,8 @@ import * as d3 from 'd3';
 
 const gatherPoints = async (accessToken, projectId, mapId) => {
   const map = await Promise.all(
-    mapId.map( async ({value}) => {
-      const {points} = await api.getMapById(accessToken, value);
+    mapId.map(async ({ value }) => {
+      const { points } = await api.getMapById(accessToken, value);
       return points;
     })
   )
@@ -14,9 +14,9 @@ const gatherPoints = async (accessToken, projectId, mapId) => {
 
 const getComments = async (accessToken, divPointId) => {
   const comments = await Promise.all(
-    divPointId?.map( async ({value}) => {
+    divPointId?.map(async ({ value }) => {
       const data = await api.getCommentsGroupedByQuestionReport(accessToken, value);
-      const getOnlyComments = await data.map(({comments}) => comments);
+      const getOnlyComments = await data?.map(({ comments }) => comments);
       return getOnlyComments.flat();
     })
   )
@@ -24,9 +24,9 @@ const getComments = async (accessToken, divPointId) => {
 };
 
 const getCount = (arrayToReduce) => {
-    const count = arrayToReduce.reduce((acc, {author} ) => {        
-        return { ...acc, [author.id]: (acc[author.id] || 0) + 1}
-    }, []);  
+  const count = arrayToReduce.reduce((acc, { author }) => {
+    return { ...acc, [author.id]: (acc[author.id] || 0) + 1 }
+  }, []);
   return count;
 };
 
@@ -34,7 +34,7 @@ export async function gatherData(accessToken, projectId, mapId, divPointId) {
   const data = await gatherPoints(accessToken, projectId, mapId);
 
   const comments = await getComments(accessToken, divPointId);
-  
+
   const replies = comments.map(({ replies }) => {
     return replies;
   });
@@ -44,16 +44,16 @@ export async function gatherData(accessToken, projectId, mapId, divPointId) {
 
   const usersCommentsCount = getCount(comments);
   const usersAnswersCount = getCount(replies.flat());
-  const usersAgreementsCount = agreements.flat().reduce((acc, {user_id}) => {        
+  const usersAgreementsCount = agreements.flat().reduce((acc, { user_id }) => {
     return { ...acc, [user_id]: (acc[user_id] || 0) + 1 }
-  }, []);  
-  
-  const users = data[1].users.map(({name, id}) => {
-    return {name: name, id: id}
+  }, []);
+
+  const users = data[1].users.map(({ name, id }) => {
+    return { name: name, id: id }
   });
 
   const usersForUserTable = users.map(user => {
-      return [{...user, 'comments': usersCommentsCount[user['id']] || 0, 'answers': usersAnswersCount[user['id']] || 0, 'agreements': usersAgreementsCount[user['id']] || 0 }];
+    return [{ ...user, 'comments': usersCommentsCount[user['id']] || 0, 'answers': usersAnswersCount[user['id']] || 0, 'agreements': usersAgreementsCount[user['id']] || 0 }];
   });
 
   return usersForUserTable.flat();
@@ -244,8 +244,8 @@ export async function gatherGraphData(accessToken, projectId, mode) {
   return cData;
 }
 
-export async function extractUserCommentInfo(accessToken, projectId = undefined, mapId = undefined, divPoint = undefined ) {
-  
+export async function extractUserCommentInfo(accessToken, projectId = undefined, mapId = undefined, divPoint = undefined) {
+
   const cData = await gatherGraphData(accessToken, projectId, "usuário");
   // console.log("🚀 ~ file: graphData.js ~ line 192 ~ extractUserCommentInfo ~ cData", cData)
   const fullLinks = cData.links.map(link => {
