@@ -44,7 +44,7 @@ export default function MapList({ projectId, handleSelectChange }) {
     projectId && (
       <Select
         placeholder={i18n.t("main.placeholderMap")}
-        options={mapList}
+        options={allSelected ? '' : mapList}
         isMulti
         value={allSelected ? mapList.slice(1) : selected}
         onChange={(selected) => {

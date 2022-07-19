@@ -47,7 +47,7 @@ export function exportJson(dataElement) {
   link.style.display = 'none';
   link.setAttribute('target', '_blank');
   // link_svg.href = url;
-  link.setAttribute("href", dataStr);
+  link?.setAttribute("href", dataStr);
   link.setAttribute("download", "data.json");
   document.body.appendChild(link);
   link.click();

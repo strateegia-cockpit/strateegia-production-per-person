@@ -1,41 +1,10 @@
 import { Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
 import { Fragment, useEffect, useState } from "react";
-import { mean, stdev } from "stats-lite";
+
 import { THeader } from "./THeader";
 
-export const StatisticsTable = ({ commentsReport }) => {
-  const [reportLists, setReportLists] = useState(null);
-
-  useEffect(() => {
-    const filteredUsers = commentsReport ? commentsReport.filter(user => user !== undefined && user !== 'empty') : commentsReport
-    if (filteredUsers) {
-      const commentsList = filteredUsers.map((d) => d.comments || 0);
-      const repliesList = filteredUsers.map((d) => d.answers || 0);
-      const commentsListMean = mean(commentsList);
-      const commentsListStDev = stdev(commentsList);
-      const commentsListEquilibriumIndex =
-        (1 - commentsListStDev / commentsListMean) * 100;
-      const repliesListMean = mean(repliesList);
-      const repliesListStDev = stdev(repliesList);
-      const repliesListEquilibriumIndex =
-        (1 - repliesListStDev / repliesListMean) * 100;
-      const totalEquilibriumIndex =
-        (commentsListEquilibriumIndex + repliesListEquilibriumIndex) / 2;
-      const outputLists = {
-        commentsListMean,
-        commentsListStDev,
-        commentsListEquilibriumIndex,
-        repliesListMean,
-        repliesListStDev,
-        repliesListEquilibriumIndex,
-        totalEquilibriumIndex,
-      };
-      // console.log("output %o", outputLists);
-      setReportLists({ ...outputLists });
-    } else {
-      setReportLists(null);
-    }
-  }, [commentsReport]);
+export const StatisticsTable = ({ reportLists }) => {
+  
 
   function ifNegativeShowZero(value) {
     if (value > 0) {

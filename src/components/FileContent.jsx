@@ -9,7 +9,15 @@ function loadFile(url, callback) {
     PizZipUtils.getBinaryContent(url, callback);
 }
 
-export const generateDocument = (commentsReport, StatisticsTable) => {
+function ifNegativeShowZero(value) {
+    if (value > 0) {
+      return value.toFixed(2)
+    } else {
+      return 0
+    }
+  }
+
+export const generateDocument = (commentsReport, reportLists) => {
 
     loadFile(
         reportsCockpit,
@@ -23,12 +31,12 @@ export const generateDocument = (commentsReport, StatisticsTable) => {
                 linebreaks: true,
             });
 
-            const docData = commentsReport?.counter.sort((a, b) => sortString(a.user, b.user))
-            .map(({user, comments, replies, agreements}, i) => {
+            const docData = commentsReport?.sort((a, b) => sortString(a["name"], b["name"]))
+            .map(({name, comments, replies, agreements}, i) => {
                 const blueRow = {
                     'hasBlue': true,
                     'hasWhite': false,
-                    'name': user,
+                    'name': name.toLowerCase(),
                     'answer': comments || 0,
                     'comment': replies || 0,
                     'agree': agreements || 0,
@@ -36,18 +44,23 @@ export const generateDocument = (commentsReport, StatisticsTable) => {
                 const whiteRow = {
                     'hasBlue': false,
                     'hasWhite': true,
-                    'name_2': user,
+                    'name_2': name.toLowerCase(),
                     'answer_2': comments || 0,
                     'comment_2': replies || 0,
                     'agree_2': agreements || 0,
                 };
-
+                
                 return i % 2 == 0 ? blueRow : whiteRow;
-            
             });
-
+            
             doc.render({
-                'td1_1': 'blabla',
+                'td1_1': ifNegativeShowZero(reportLists?.commentsListMean),
+                'td1_2': ifNegativeShowZero(reportLists?.repliesListMean),
+                'td2_1': ifNegativeShowZero(reportLists?.commentsListStDev),
+                'td2_2': ifNegativeShowZero(reportLists?.repliesListStDev),
+                'td3_1': ifNegativeShowZero(reportLists?.commentsListEquilibriumIndex),
+                'td3_2': ifNegativeShowZero(reportLists?.repliesListEquilibriumIndex),
+                'td4_1': ifNegativeShowZero(reportLists?.totalEquilibriumIndex),
                 'person': docData
             });
 

@@ -12,16 +12,16 @@ import MapList from "../components/MapList";
 import ProjectList from "../components/ProjectList";
 import DivPointList from "../components/DivPointList";
 import { extractUserCommentInfo, gatherData } from "../data/graphData";
-import { sortString } from "../utils/exportFunctions";
 import { i18n } from "../translate/i18n";
 import { ExportsButtons } from "../components/ExportsButtons";
 import UserTable from "../components/UserTable";
-import { generateDocument } from "../components/FileContent"; 
+import { generateDocument } from "../components/FileContent";
+import { StatisticsTable } from "../components/StatisticsTable";
 
 export default function Main() {
   const [selectedProject, setSelectedProject] = useState("");
   const [selectedMap, setSelectedMap] = useState("");
-  const [selectedDivPoint, setSelectedDivPoint] = useState("");
+  const [selectedDivPoint, setSelectedDivPoint] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [accessToken, setAccessToken] = useState("");
   const [commentsReport, setCommentsReport] = useState(null);
@@ -53,6 +53,8 @@ export default function Main() {
   const handleDivPointSelectChange = (value) => {
     setSelectedDivPoint(value);
     gatherData(accessToken, selectedProject, selectedMap, value);
+
+
   };
 
   useEffect(() => {
@@ -111,18 +113,11 @@ export default function Main() {
         mapId={selectedMap}
         handleSelectChange={handleDivPointSelectChange}
       />
-      <ExportsButtons data={commentsReport?.counter || ''} rawData={rawData} saveFile={() => generateDocument(commentsReport)} project={rawData}/>
-      <Loading active={isLoading} />
-      <Heading as="h3" size="lg" mb={12} mt={3}>
-        {i18n.t('main.heading')}
-      </Heading>
-      {selectedDivPoint && (
         <Fragment>
           <Flex mt={2} justify={"end"}>
           </Flex>
-          <UserTable accessToken={accessToken} selectedProject={selectedProject} selectedMap={selectedMap} selectedDivPoint={selectedDivPoint}/>
+          <UserTable accessToken={accessToken} selectedProject={selectedProject} selectedMap={selectedMap} selectedDivPoint={selectedDivPoint ? selectedDivPoint : null} isLoading={isLoading}/>
         </Fragment>
-      )}
     </Box>
   );
 }

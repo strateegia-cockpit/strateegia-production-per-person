@@ -61,7 +61,7 @@ export default function DivPointList({ mapId, handleSelectChange, innerRef }) {
   return mapId && (
     <Select
       placeholder={i18n.t('main.placeholderDiv')} 
-      options={divPointList}
+      options={allSelected ? '' : divPointList }
       isMulti 
       value={ allSelected ? divPointList.slice(1) : selected}
       onChange={ selected => {

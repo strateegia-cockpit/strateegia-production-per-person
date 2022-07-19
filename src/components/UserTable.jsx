@@ -1,23 +1,27 @@
 import React, { Fragment } from "react";
-import { Table, Thead, Tbody, Tr, Th, Td, Checkbox } from "@chakra-ui/react";
+import { Heading, Table, Thead, Tbody, Tr, Th, Td, Checkbox } from "@chakra-ui/react";
 import { i18n } from "../translate/i18n";
 import { gatherData } from "../data/graphData";
 import { StatisticsTable } from "./StatisticsTable";
+import { mean, stdev } from "stats-lite";
 import { THeader } from "./THeader";
-
+import { ExportsButtons } from "../components/ExportsButtons";
+import { generateDocument } from "../components/FileContent";
+import Loading from "../components/Loading";
 
 const UserTable = ({
   accessToken,
   selectedProject,
   selectedMap,
   selectedDivPoint,
+  isLoading
 }) => {
   const [commentsReport, setCommentsReport] = React.useState(null);
-  const [selectedUsers, setSelectedUsers] = React.useState(null)
+  const [selectedUsers, setSelectedUsers] = React.useState(null);
+  const [reportLists, setReportLists] = React.useState(null);
 
   React.useEffect(() => {
     async function fetchData() {
-      //   setIsLoading(true);
       try {
         const response2 = await gatherData(
           accessToken,
@@ -30,7 +34,6 @@ const UserTable = ({
       } catch (error) {
         console.log(error);
       }
-      //   setIsLoading(false);
     }
     fetchData();
   }, [selectedDivPoint]);
@@ -39,12 +42,47 @@ const UserTable = ({
     const oi = commentsReport !== null ? [...commentsReport] : null
     setSelectedUsers(oi);  
   }, [commentsReport]);
+
+  React.useEffect(() => {
+    const filteredUsers = selectedUsers ? selectedUsers.filter(user => user !== undefined && user !== 'empty') : commentsReport
+    if (filteredUsers) {
+      const commentsList = filteredUsers.map((d) => d.comments || 0);
+      const repliesList = filteredUsers.map((d) => d.answers || 0);
+      const commentsListMean = mean(commentsList);
+      const commentsListStDev = stdev(commentsList);
+      const commentsListEquilibriumIndex =
+        (1 - commentsListStDev / commentsListMean) * 100;
+      const repliesListMean = mean(repliesList);
+      const repliesListStDev = stdev(repliesList);
+      const repliesListEquilibriumIndex =
+        (1 - repliesListStDev / repliesListMean) * 100;
+      const totalEquilibriumIndex =
+        (commentsListEquilibriumIndex + repliesListEquilibriumIndex) / 2;
+      const outputLists = {
+        commentsListMean,
+        commentsListStDev,
+        commentsListEquilibriumIndex,
+        repliesListMean,
+        repliesListStDev,
+        repliesListEquilibriumIndex,
+        totalEquilibriumIndex,
+      };
+      setReportLists({ ...outputLists });
+    } else {
+      setReportLists(null);
+    }
+  }, [selectedUsers])
   
   return (
     <Fragment>
+      <ExportsButtons data={commentsReport?.counter || ''} rawData={''} saveFile={() => generateDocument(commentsReport, reportLists)} project={selectedUsers}/>
+      <Loading active={isLoading} />
+      <Heading as="h3" size="lg" mb={12} mt={3}>
+        {i18n.t('main.heading')}
+      </Heading>
       {selectedUsers && (
         <Table variant="striped" w="60vw">
-          <StatisticsTable commentsReport={selectedUsers ? selectedUsers : commentsReport} />
+          <StatisticsTable reportLists={reportLists} />
           <Thead>
             <Tr textTransform="lowercase">
               {/* <THeader maxWidth='sm' alignment='center'/> */}
