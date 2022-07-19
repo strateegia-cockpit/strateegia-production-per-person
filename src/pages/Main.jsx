@@ -45,6 +45,7 @@ export default function Main() {
   };
 
   const handleMapSelectChange = (value) => {
+    setSelectedDivPoint("")
     setSelectedMap(value);
     gatherData(accessToken, selectedProject, value);
   };

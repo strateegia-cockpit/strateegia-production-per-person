@@ -14,8 +14,6 @@ const UserTable = ({
 }) => {
   const [commentsReport, setCommentsReport] = React.useState(null);
   const [selectedUsers, setSelectedUsers] = React.useState(null)
-  const [truee, setTruee] = React.useState(true);
-  const [rawData, setRawData] = React.useState(null);
 
   React.useEffect(() => {
     async function fetchData() {
