@@ -1,6 +1,7 @@
 import { Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
 import { Fragment, useEffect, useState } from "react";
 import { mean, stdev } from "stats-lite";
+import { THeader } from "./THeader";
 
 export const StatisticsTable = ({ commentsReport }) => {
   const [reportLists, setReportLists] = useState(null);
@@ -36,22 +37,31 @@ export const StatisticsTable = ({ commentsReport }) => {
     }
   }, [commentsReport]);
 
+  function ifNegativeShowZero(value) {
+    if (value > 0) {
+      return value.toFixed(2)
+    } else {
+      return 0
+    }
+  }
+
   return (
     <Fragment>
       <Thead>
         <Tr>
-          <Th>estatística</Th>
-          <Th>respostas às questões</Th>
-          <Th>comentários às respostas</Th>
+          <THeader text='estatística' width={'200px'}/>
+          <THeader text='respostas às questões' width={'200px'}/>
+          <THeader text='comentários às respostas' width={'200px'}/>
         </Tr>
       </Thead>
       <Tbody>
         <Tr key="mean">
           <Td>média</Td>
-          <Td>{reportLists?.commentsListMean.toFixed(2)}</Td>
-          <Td>{reportLists?.repliesListMean.toFixed(2)}</Td>
+          <Td>{ifNegativeShowZero(reportLists?.commentsListMean)}</Td>
+          <Td>{ifNegativeShowZero(reportLists?.repliesListMean)}</Td>
           <Td></Td>
         </Tr>
+        {/* ifNegativeShowZero() */}
         {/* <Tr key="median">
           <Td>mediana</Td>
           <Td>{calculateMedian("comments")}</Td>
@@ -66,8 +76,8 @@ export const StatisticsTable = ({ commentsReport }) => {
         </Tr> */}
         <Tr key="stddev">
           <Td>desvio padrão</Td>
-          <Td>{reportLists?.commentsListStDev.toFixed(2)}</Td>
-          <Td>{reportLists?.repliesListStDev.toFixed(2)}</Td>
+          <Td>{ifNegativeShowZero(reportLists?.commentsListStDev)}</Td>
+          <Td>{ifNegativeShowZero(reportLists?.repliesListStDev)}</Td>
           <Td></Td>
         </Tr>
         {/* <Tr key="variance">
@@ -78,16 +88,18 @@ export const StatisticsTable = ({ commentsReport }) => {
         </Tr> */}
         <Tr key="coefficient">
           <Td>índice de equilíbrio</Td>
-          <Td>{reportLists?.commentsListEquilibriumIndex.toFixed(2)}%</Td>
-          <Td>{reportLists?.repliesListEquilibriumIndex.toFixed(2)}%</Td>
+          <Td>{ifNegativeShowZero(reportLists?.commentsListEquilibriumIndex)}%</Td>
+          <Td>{ifNegativeShowZero(reportLists?.repliesListEquilibriumIndex)}%</Td>
           <Td></Td>
         </Tr>
         <Tr key="total">
           <Td>índice de equilíbrio total</Td>
-          <Td colspan={3}>{reportLists?.totalEquilibriumIndex.toFixed(2)}%</Td>
+          <Td colspan={3}>{ifNegativeShowZero(reportLists?.totalEquilibriumIndex)}%</Td>
         </Tr>
       </Tbody>
       <br></br>
     </Fragment>
   );
 };
+
+

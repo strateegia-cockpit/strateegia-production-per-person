@@ -3,36 +3,8 @@ import { Table, Thead, Tbody, Tr, Th, Td, Checkbox } from "@chakra-ui/react";
 import { i18n } from "../translate/i18n";
 import { gatherData } from "../data/graphData";
 import { StatisticsTable } from "./StatisticsTable";
+import { THeader } from "./THeader";
 
-export const THeader = ({ text, weight, alignment, width, maxWidth }) => {
-  
-  return (
-    <Th
-      textTransform="lowercase"
-      textAlign={alignment || "center"}
-      fontWeight={weight || 500}
-      className="biggerTh"
-      fontFamily="Montserrat, sans-serif"
-      fontSize={16}
-      minW={width || "auto"}
-      size={maxWidth || "auto"}
-    >
-      {text || ""}
-    </Th>
-  );
-};
-
-function sortString(a, b) {
-  const nameA = a.toUpperCase(); // ignore upper and lowercase
-  const nameB = b.toUpperCase(); // ignore upper and lowercase
-  if (nameA < nameB) {
-    return -1;
-  }
-  if (nameA > nameB) {
-    return 1;
-  }
-  return 0;
-}
 
 const UserTable = ({
   accessToken,
@@ -138,3 +110,15 @@ const UserTable = ({
 };
 
 export default UserTable;
+
+function sortString(a, b) {
+  const nameA = a.toUpperCase(); // ignore upper and lowercase
+  const nameB = b.toUpperCase(); // ignore upper and lowercase
+  if (nameA < nameB) {
+    return -1;
+  }
+  if (nameA > nameB) {
+    return 1;
+  }
+  return 0;
+}

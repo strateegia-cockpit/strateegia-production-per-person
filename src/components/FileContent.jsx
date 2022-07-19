@@ -9,7 +9,7 @@ function loadFile(url, callback) {
     PizZipUtils.getBinaryContent(url, callback);
 }
 
-export const generateDocument = (commentsReport) => {
+export const generateDocument = (commentsReport, StatisticsTable) => {
 
     loadFile(
         reportsCockpit,
@@ -47,6 +47,7 @@ export const generateDocument = (commentsReport) => {
             });
 
             doc.render({
+                'td1_1': 'blabla',
                 'person': docData
             });
 
