@@ -19,6 +19,7 @@ const UserTable = ({
   const [commentsReport, setCommentsReport] = React.useState(null);
   const [selectedUsers, setSelectedUsers] = React.useState(null);
   const [reportLists, setReportLists] = React.useState(null);
+  const [combinedCsv, setCombinedCsv] = React.useState('');
 
   React.useEffect(() => {
     async function fetchData() {
@@ -73,9 +74,27 @@ const UserTable = ({
     }
   }, [selectedUsers])
   
+  React.useEffect(() => {
+    const toCombine = selectedUsers !== null ? [...selectedUsers] : null
+    selectedUsers && toCombine.unshift(reportLists)
+    // console.log("🚀 ~ file: UserTable.jsx ~ line 80 ~ React.useEffect ~ toCombine", toCombine)
+    setCombinedCsv(toCombine)
+  }, [reportLists])
+
+  React.useEffect(() => {
+
+    
+  }, [combinedCsv])
+  
   return (
     <Fragment>
-      <ExportsButtons data={commentsReport?.counter || ''} rawData={''} saveFile={() => generateDocument(commentsReport, reportLists)} project={selectedUsers}/>
+      <ExportsButtons 
+        users={selectedUsers ? selectedUsers : ''} 
+        stats={reportLists ? [reportLists] : ''} 
+        rawData={{"statistics data" : reportLists , "users data" : selectedUsers}} 
+        saveFile={() => generateDocument(selectedUsers, reportLists)} 
+        project={selectedUsers}
+      />
       <Loading active={isLoading} />
       <Heading as="h3" size="lg" mb={12} mt={3}>
         {i18n.t('main.heading')}
