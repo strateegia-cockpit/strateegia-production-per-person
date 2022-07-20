@@ -1,5 +1,5 @@
 import React, { Fragment } from "react";
-import { Heading, Table, Thead, Tbody, Tr, Th, Td, Checkbox } from "@chakra-ui/react";
+import { Heading, Table, Thead, Tbody, Tr, Td, Checkbox } from "@chakra-ui/react";
 import { i18n } from "../translate/i18n";
 import { gatherData } from "../data/graphData";
 import { StatisticsTable } from "./StatisticsTable";
@@ -31,12 +31,11 @@ const UserTable = ({
           selectedDivPoint
         );
         setCommentsReport(response2);
-        // setRawData([...response2.raw.sort((a, b) => sortString(a, b))]);
       } catch (error) {
         console.log(error);
       }
     }
-    fetchData();
+    selectedDivPoint && fetchData();
   }, [selectedDivPoint]);
 
   React.useEffect(() => {
@@ -72,19 +71,7 @@ const UserTable = ({
     } else {
       setReportLists(null);
     }
-  }, [selectedUsers])
-  
-  React.useEffect(() => {
-    const toCombine = selectedUsers !== null ? [...selectedUsers] : null
-    selectedUsers && toCombine.unshift(reportLists)
-    // console.log("🚀 ~ file: UserTable.jsx ~ line 80 ~ React.useEffect ~ toCombine", toCombine)
-    setCombinedCsv(toCombine)
-  }, [reportLists])
-
-  React.useEffect(() => {
-
-    
-  }, [combinedCsv])
+  }, [selectedUsers]);
   
   return (
     <Fragment>
@@ -104,7 +91,6 @@ const UserTable = ({
           <StatisticsTable reportLists={reportLists} />
           <Thead>
             <Tr textTransform="lowercase">
-              {/* <THeader maxWidth='sm' alignment='center'/> */}
               <THeader alignment="left" />
               <THeader width={"120px"} text={i18n.t("userTable.th2")} />
               <THeader text={i18n.t("userTable.th3")} />

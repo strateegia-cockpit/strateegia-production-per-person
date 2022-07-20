@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-// import { Select } from '@chakra-ui/react';
 import * as api from "strateegia-api";
 import Select from "react-select";
 import { i18n } from "../translate/i18n";

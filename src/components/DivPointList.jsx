@@ -38,7 +38,7 @@ export default function DivPointList({ mapId, handleSelectChange, innerRef }) {
     }
     setAllSelected(false);
     setSelected(null);
-    fetchMapList();
+    mapId && fetchMapList();
   }, [mapId]);
 
   function getOnlyDivPoints(map) {

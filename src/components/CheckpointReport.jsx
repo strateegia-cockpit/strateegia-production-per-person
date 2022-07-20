@@ -27,7 +27,6 @@ export function CheckpointReport({ checkpointAndComments }) {
                     <Text>
                       {comment.author.name}: {comment.text}
                     </Text>
-                    {/* <Text>Criador: {comment.author.name}</Text> */}
                   </ListItem>
                 ))}
               </UnorderedList>
