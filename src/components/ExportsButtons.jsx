@@ -36,10 +36,11 @@ export const exportJSONData = (data) => {
 };
 
 function dataToCsv(data) {
-  const items = data;
+  const filteredData = data && data.filter(user => user !== undefined && user !== 'empty')
+  const items = filteredData;
   const replacer = (key, value) => value === null ? '' : value; // specify how you want to handle null values here
-  const header = Object.keys(items[0]);
-  const csv = [
+  const header = items && Object.keys(items[0]);
+  const csv = header && [
     header.join(','), // header row first
     ...items.map(row => header.map(fieldName => JSON.stringify(row[fieldName], replacer)).join(','))
   ].join('\r\n');
