@@ -63,10 +63,9 @@ export const StatisticsTable = ({ reportLists }) => {
         </Tr>
         <Tr key="total">
           <Td>índice de equilíbrio total</Td>
-          <Td colspan={3}>{ifNegativeShowZero(reportLists?.totalEquilibriumIndex)}%</Td>
+          <Td colSpan={3}>{ifNegativeShowZero(reportLists?.totalEquilibriumIndex)}%</Td>
         </Tr>
       </Tbody>
-      <br></br>
     </Fragment>
   );
 };

@@ -3,7 +3,7 @@ import PizZip from "pizzip";
 import PizZipUtils from "pizzip/utils/index.js";
 import { reportsCockpit } from '../assets/files' 
 import { saveAs } from "file-saver";
-import { sortString } from "../utils/exportFunctions";
+import { sortString } from "../hooks/useSortString" 
 
 function loadFile(url, callback) {
     PizZipUtils.getBinaryContent(url, callback);

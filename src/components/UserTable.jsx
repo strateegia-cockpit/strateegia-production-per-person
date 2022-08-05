@@ -1,5 +1,5 @@
 import React, { Fragment } from "react";
-import { Heading, Table, Thead, Tbody, Tr, Td, Checkbox } from "@chakra-ui/react";
+import { Heading, Table, Thead, Tbody, Tr, Td, Checkbox, Box } from "@chakra-ui/react";
 import { i18n } from "../translate/i18n";
 import { gatherData } from "../data/graphData";
 import { StatisticsTable } from "./StatisticsTable";
@@ -7,6 +7,7 @@ import { mean, stdev } from "stats-lite";
 import { THeader } from "./THeader";
 import { ExportsButtons } from "../components/ExportsButtons";
 import { generateDocument } from "../components/FileContent";
+import { sortString } from "../hooks/useSortString";
 import Loading from "../components/Loading";
 
 const UserTable = ({
@@ -39,8 +40,9 @@ const UserTable = ({
   }, [selectedDivPoint]);
 
   React.useEffect(() => {
-    const oi = commentsReport !== null ? [...commentsReport] : null
-    setSelectedUsers(oi);  
+    const selectUsers = commentsReport !== null ? [...commentsReport] : null
+    selectUsers?.sort((a, b) => sortString(a["name"], b["name"]))
+    setSelectedUsers(selectUsers);  
   }, [commentsReport]);
 
   React.useEffect(() => {
@@ -87,10 +89,11 @@ const UserTable = ({
         {i18n.t('main.heading')}
       </Heading>
       {selectedUsers && (
-        <Table variant="striped" w="60vw">
+        <Table variant="striped" w="60vw" >
           <StatisticsTable reportLists={reportLists} />
-          <Thead>
-            <Tr textTransform="lowercase">
+          <br></br>
+          <Thead >
+            <Tr textTransform="lowercase" >
               <THeader alignment="left" />
               <THeader width={"120px"} text={i18n.t("userTable.th2")} />
               <THeader text={i18n.t("userTable.th3")} />
@@ -107,9 +110,11 @@ const UserTable = ({
                       <Td
                         key={comment.name} 
                         textTransform="lowercase" 
-                        display='flex'>
-                        
-                        <Checkbox marginRight={3}
+                        display='flex'
+                      >
+                        <Checkbox 
+                          marginRight={3}
+                          key={comment.id}
                           isChecked={selectedUsers[i] ? true : false}
                           onChange={() => {
                             const users = [...selectedUsers]
@@ -152,14 +157,4 @@ const UserTable = ({
 
 export default UserTable;
 
-function sortString(a, b) {
-  const nameA = a.toUpperCase(); // ignore upper and lowercase
-  const nameB = b.toUpperCase(); // ignore upper and lowercase
-  if (nameA < nameB) {
-    return -1;
-  }
-  if (nameA > nameB) {
-    return 1;
-  }
-  return 0;
-}
+
