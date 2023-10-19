@@ -53,34 +53,48 @@ const UserTable = ({
   }, [commentsReport]);
 
   useEffect(() => {
-    const filteredUsers = selectedUsers ? selectedUsers.filter(user => user !== undefined && user !== 'empty') : commentsReport
+    const filteredUsers = selectedUsers ? selectedUsers.filter(user => user !== undefined && user !== 'empty') : commentsReport;
     if (filteredUsers) {
-      const commentsList = filteredUsers.map((d) => d.comments || 0);
-      const repliesList = filteredUsers.map((d) => d.replies || 0);
-      const commentsListMean = mean(commentsList);
-      const commentsListStDev = stdev(commentsList);
-      const commentsListEquilibriumIndex =
-        (1 - commentsListStDev / commentsListMean) * 100;
-      const repliesListMean = mean(repliesList);
-      const repliesListStDev = stdev(repliesList);
-      const repliesListEquilibriumIndex =
-        (1 - repliesListStDev / repliesListMean) * 100;
-      const totalEquilibriumIndex =
-        (commentsListEquilibriumIndex + repliesListEquilibriumIndex) / 2;
-      const outputLists = {
-        commentsListMean,
-        commentsListStDev,
-        commentsListEquilibriumIndex,
-        repliesListMean,
-        repliesListStDev,
-        repliesListEquilibriumIndex,
-        totalEquilibriumIndex,
-      };
-      setReportLists({ ...outputLists });
+
+        const computeStats = (list) => {
+            const meanVal = mean(list);
+            const stdevVal = stdev(list);
+            const equilibriumIndex = (1 - stdevVal / meanVal) * 100;
+            return { mean: meanVal, stdev: stdevVal, equilibriumIndex };
+        };
+
+        const commentEngagementStats = computeStats(
+            filteredUsers.map(d => (d.comments * 100) || 0)
+        );
+        const replyEngagementStats = computeStats(
+            filteredUsers.map(d => ((d.comments * 100) / commentGoal) || 0)
+        );
+        const totalEngagementStats = computeStats(
+            filteredUsers.map(d => {
+                const commentEngagement = (d.comments * 100) || 0;
+                const replyEngagement = ((d.comments * 100) / commentGoal) || 0;
+                return (commentEngagement + replyEngagement) / 2;
+            })
+        );
+
+        const outputLists = {
+            commentsListMean: commentEngagementStats.mean,
+            commentsListStDev: commentEngagementStats.stdev,
+            commentsListEquilibriumIndex: commentEngagementStats.equilibriumIndex,
+            repliesListMean: replyEngagementStats.mean,
+            repliesListStDev: replyEngagementStats.stdev,
+            repliesListEquilibriumIndex: replyEngagementStats.equilibriumIndex,
+            totalEquilibriumIndex: totalEngagementStats.equilibriumIndex,
+        };
+        
+        setReportLists(outputLists);
     } else {
-      setReportLists(null);
+        setReportLists(null);
     }
-  }, [selectedUsers]);
+}, [selectedUsers]);
+
+
+
   
   return (
     <Fragment>
