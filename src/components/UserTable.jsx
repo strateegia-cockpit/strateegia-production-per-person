@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useEffect } from "react";
 import { Heading, Table, Thead, Tbody, Tr, Td, Checkbox, Box } from "@chakra-ui/react";
 import { i18n } from "../translate/i18n";
 import { gatherData } from "../data/graphData";
@@ -22,7 +22,14 @@ const UserTable = ({
   const [reportLists, setReportLists] = React.useState(null);
   const [combinedCsv, setCombinedCsv] = React.useState('');
 
-  React.useEffect(() => {
+  const commentGoal = selectedUsers !== null ? selectedUsers.filter(user => user !== undefined && user !== 'empty').length * 0.1 : 0
+  console.log('commentGoal', commentGoal)
+  
+  useEffect(() => {
+    console.log('selectedUsers', selectedUsers)
+  }, [selectedUsers])
+
+  useEffect(() => {
     async function fetchData() {
       try {
         const response2 = await gatherData(
@@ -39,17 +46,17 @@ const UserTable = ({
     selectedDivPoint && fetchData();
   }, [selectedDivPoint]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const selectUsers = commentsReport !== null ? [...commentsReport] : null
     selectUsers?.sort((a, b) => sortString(a["name"], b["name"]))
     setSelectedUsers(selectUsers);  
   }, [commentsReport]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const filteredUsers = selectedUsers ? selectedUsers.filter(user => user !== undefined && user !== 'empty') : commentsReport
     if (filteredUsers) {
       const commentsList = filteredUsers.map((d) => d.comments || 0);
-      const repliesList = filteredUsers.map((d) => d.answers || 0);
+      const repliesList = filteredUsers.map((d) => d.replies || 0);
       const commentsListMean = mean(commentsList);
       const commentsListStDev = stdev(commentsList);
       const commentsListEquilibriumIndex =
@@ -95,15 +102,21 @@ const UserTable = ({
           <Thead >
             <Tr textTransform="lowercase" >
               <THeader alignment="left" />
-              <THeader width={"120px"} text={i18n.t("userTable.th2")} />
-              <THeader text={i18n.t("userTable.th3")} />
-              <THeader text={i18n.t("userTable.th4")} />
+              <THeader width={"120px"} text={i18n.t("userTable.th2")} weight={800} />
+              <THeader text={i18n.t("userTable.th3")} weight={800} />
+              <THeader text={i18n.t("userTable.th4")} weight={800} />
+              <THeader text={i18n.t("userTable.th5")} weight={800} />
+              <THeader text={i18n.t("userTable.th6")} weight={800} />
+              <THeader text={i18n.t("userTable.th7")} weight={800} />
             </Tr>
           </Thead>
           <Tbody>
             {commentsReport
               ?.sort((a, b) => sortString(a["name"], b["name"]))
               .map((comment, i) => {
+                const commentEngagement = comment.comments * 100 || 0;
+                const replyEngagement = ((comment.comments * 100) / commentGoal) || 0;
+                const totalEngagement = (commentEngagement + replyEngagement) / 2;
                 return (
                   <>
                     <Tr key={i}>
@@ -133,15 +146,22 @@ const UserTable = ({
                       <Td key={comment.name + comment.comments} textAlign="center">
                         {comment.comments || 0}
                       </Td>
-                      <Td key={comment.answers + comment.name} textAlign="center">
-                        {comment.answers || 0}
+                      <Td key={comment.replies + comment.name} textAlign="center">
+                        {comment.replies || 0}
                       </Td>
-                      <Td
-                        key={comment.name + comment.agreements + comment.user}
-                        textAlign="center"
-                      >
+                      <Td key={comment.name + comment.agreements + comment.user} textAlign="center">
                         {comment.agreements || 0}
                       </Td>
+                      <Td key={comment.name + comment.agreements + comment.user + comment.name} textAlign="center">
+                        {commentEngagement} %
+                      </Td>
+                      <Td key={comment.name + comment.agreements + comment.user + comment.name + comment.name} textAlign="center">
+                        {replyEngagement} %
+                      </Td>
+                      <Td key={comment.name + comment.agreements + comment.user + comment.name + comment.user} textAlign="center">
+                        {totalEngagement} %
+                      </Td>
+                      
                     </Tr>
                   </>
                 );

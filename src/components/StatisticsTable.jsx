@@ -18,9 +18,9 @@ export const StatisticsTable = ({ reportLists }) => {
     <Fragment>
       <Thead>
         <Tr>
-          <THeader text='estatística' width={'200px'}/>
-          <THeader text='respostas às questões' width={'200px'}/>
-          <THeader text='comentários às respostas' width={'200px'}/>
+          <THeader text='estatística' width={'200px'} weight={800} />
+          <THeader text='respostas às questões' width={'200px'} weight={800} />
+          <THeader text='comentários às respostas' width={'200px'} weight={800} />
         </Tr>
       </Thead>
       <Tbody>
