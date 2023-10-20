@@ -53,7 +53,7 @@ export async function gatherData(accessToken, projectId, mapId, divPointId) {
   });
 
   const usersForUserTable = users.map(user => {
-    return [{ ...user, 'comments': usersCommentsCount[user['id']] || 0, 'answers': usersAnswersCount[user['id']] || 0, 'agreements': usersAgreementsCount[user['id']] || 0 }];
+    return [{ ...user, 'comments': usersCommentsCount[user['id']] || 0, 'replies': usersAnswersCount[user['id']] || 0, 'agreements': usersAgreementsCount[user['id']] || 0 }];
   });
 
   return usersForUserTable.flat();

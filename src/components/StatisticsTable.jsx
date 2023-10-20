@@ -1,5 +1,5 @@
-import { Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
-import { Fragment, useEffect, useState } from "react";
+import { Tbody, Td, Thead, Tr } from "@chakra-ui/react";
+import { Fragment } from "react";
 
 import { THeader } from "./THeader";
 
@@ -18,9 +18,12 @@ export const StatisticsTable = ({ reportLists }) => {
     <Fragment>
       <Thead>
         <Tr>
-          <THeader text='estatística' width={'200px'}/>
-          <THeader text='respostas às questões' width={'200px'}/>
-          <THeader text='comentários às respostas' width={'200px'}/>
+          <THeader text='estatística' width={'200px'} weight={800} />
+          <THeader text='respostas às questões' width={'200px'} weight={800} />
+          <THeader text='comentários às respostas' width={'200px'} weight={800} />
+          <THeader text='engajamento respostas' width={'200px'} weight={800} />
+          <THeader text='engajamento comentários' width={'200px'} weight={800} />
+          <THeader text='engajamento' width={'200px'} weight={800} />
         </Tr>
       </Thead>
       <Tbody>
@@ -28,6 +31,9 @@ export const StatisticsTable = ({ reportLists }) => {
           <Td>média</Td>
           <Td>{ifNegativeShowZero(reportLists?.commentsListMean)}</Td>
           <Td>{ifNegativeShowZero(reportLists?.repliesListMean)}</Td>
+          <Td>{ifNegativeShowZero(reportLists?.commentEngagementMean)} %</Td>
+          <Td>{ifNegativeShowZero(reportLists?.replyEngagementMean)} %</Td>
+          <Td>{ifNegativeShowZero(reportLists?.totalEngagementMean)} %</Td>
           <Td></Td>
         </Tr>
         {/* ifNegativeShowZero() */}
@@ -47,6 +53,9 @@ export const StatisticsTable = ({ reportLists }) => {
           <Td>desvio padrão</Td>
           <Td>{ifNegativeShowZero(reportLists?.commentsListStDev)}</Td>
           <Td>{ifNegativeShowZero(reportLists?.repliesListStDev)}</Td>
+          <Td>{ifNegativeShowZero(reportLists?.commentEngagementStDev)} %</Td>
+          <Td>{ifNegativeShowZero(reportLists?.replyEngagementStDev)} %</Td>
+          <Td>{ifNegativeShowZero(reportLists?.totalEngagementStDev)} %</Td>
           <Td></Td>
         </Tr>
         {/* <Tr key="variance">
@@ -62,12 +71,10 @@ export const StatisticsTable = ({ reportLists }) => {
           <Td></Td>
         </Tr>
         <Tr key="total">
-          <Td>índice de equilíbrio total</Td>
+          <Td>índice de equilíbrio - respostas e comentários</Td>
           <Td colSpan={3}>{ifNegativeShowZero(reportLists?.totalEquilibriumIndex)}%</Td>
         </Tr>
       </Tbody>
     </Fragment>
   );
 };
-
-

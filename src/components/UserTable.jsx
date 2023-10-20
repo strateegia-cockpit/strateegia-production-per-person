@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useEffect } from "react";
 import { Heading, Table, Thead, Tbody, Tr, Td, Checkbox, Box } from "@chakra-ui/react";
 import { i18n } from "../translate/i18n";
 import { gatherData } from "../data/graphData";
@@ -22,7 +22,9 @@ const UserTable = ({
   const [reportLists, setReportLists] = React.useState(null);
   const [combinedCsv, setCombinedCsv] = React.useState('');
 
-  React.useEffect(() => {
+  const commentGoal = selectedUsers !== null ? selectedUsers.filter(user => user !== undefined && user !== 'empty').length * 0.1 : 0
+
+  useEffect(() => {
     async function fetchData() {
       try {
         const response2 = await gatherData(
@@ -39,49 +41,73 @@ const UserTable = ({
     selectedDivPoint && fetchData();
   }, [selectedDivPoint]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const selectUsers = commentsReport !== null ? [...commentsReport] : null
     selectUsers?.sort((a, b) => sortString(a["name"], b["name"]))
-    setSelectedUsers(selectUsers);  
+    setSelectedUsers(selectUsers);
   }, [commentsReport]);
 
-  React.useEffect(() => {
-    const filteredUsers = selectedUsers ? selectedUsers.filter(user => user !== undefined && user !== 'empty') : commentsReport
-    if (filteredUsers) {
-      const commentsList = filteredUsers.map((d) => d.comments || 0);
-      const repliesList = filteredUsers.map((d) => d.answers || 0);
-      const commentsListMean = mean(commentsList);
-      const commentsListStDev = stdev(commentsList);
-      const commentsListEquilibriumIndex =
-        (1 - commentsListStDev / commentsListMean) * 100;
-      const repliesListMean = mean(repliesList);
-      const repliesListStDev = stdev(repliesList);
-      const repliesListEquilibriumIndex =
-        (1 - repliesListStDev / repliesListMean) * 100;
-      const totalEquilibriumIndex =
-        (commentsListEquilibriumIndex + repliesListEquilibriumIndex) / 2;
-      const outputLists = {
-        commentsListMean,
-        commentsListStDev,
-        commentsListEquilibriumIndex,
-        repliesListMean,
-        repliesListStDev,
-        repliesListEquilibriumIndex,
-        totalEquilibriumIndex,
-      };
-      setReportLists({ ...outputLists });
-    } else {
+  useEffect(() => {
+    if (!selectedUsers) {
       setReportLists(null);
+      return;
     }
-  }, [selectedUsers]);
   
+    const filteredUsers = selectedUsers.filter(user => user !== undefined && user !== 'empty');
+    console.log('filteredUsers', filteredUsers)
+  
+    const extractData = (key) => filteredUsers.map((d) => d[key] || 0);
+    const calculateEquilibriumIndex = (mean, stdev) => (1 - stdev / mean) * 100;
+    const calculateEngagement = (comments) => comments * 100;
+    const calculateReplyEngagement = (comments) => (comments * 100) / commentGoal;
+  
+    const commentsList = extractData('comments');
+    const repliesList = extractData('replies');
+  
+    const commentsListMean = mean(commentsList);
+    const commentsListStDev = stdev(commentsList);
+    const commentsListEquilibriumIndex = calculateEquilibriumIndex(commentsListMean, commentsListStDev);
+  
+    const repliesListMean = mean(repliesList);
+    const repliesListStDev = stdev(repliesList);
+    const repliesListEquilibriumIndex = calculateEquilibriumIndex(repliesListMean, repliesListStDev);
+  
+    const totalEquilibriumIndex = (commentsListEquilibriumIndex + repliesListEquilibriumIndex) / 2;
+  
+    const commentEngagementList = filteredUsers.map(d => calculateEngagement(d.comments));
+    const replyEngagementList = filteredUsers.map(d => calculateReplyEngagement(d.comments));
+    console.log('replyEngagementList', replyEngagementList)
+    const totalEngagementList = filteredUsers.map(d => {
+      const commentEngagement = calculateEngagement(d.comments);
+      return (commentEngagement + calculateReplyEngagement(d.comments)) / 2;
+    });
+  
+    const outputLists = {
+      commentsListMean,
+      commentsListStDev,
+      commentsListEquilibriumIndex,
+      repliesListMean,
+      repliesListStDev,
+      repliesListEquilibriumIndex,
+      commentEngagementMean: mean(commentEngagementList),
+      replyEngagementMean: mean(replyEngagementList),
+      totalEngagementMean: mean(totalEngagementList),
+      commentEngagementStDev: stdev(commentEngagementList),
+      replyEngagementStDev: stdev(replyEngagementList),
+      totalEngagementStDev: stdev(totalEngagementList),
+      totalEquilibriumIndex,
+    };
+  
+    setReportLists({ ...outputLists });
+  }, [selectedUsers]);
+
   return (
     <Fragment>
-      <ExportsButtons 
-        users={selectedUsers ? selectedUsers : ''} 
-        stats={reportLists ? [reportLists] : ''} 
-        rawData={{"statistics data" : reportLists , "users data" : selectedUsers}} 
-        saveFile={() => generateDocument(selectedUsers, reportLists)} 
+      <ExportsButtons
+        users={selectedUsers ? selectedUsers : ''}
+        stats={reportLists ? [reportLists] : ''}
+        rawData={{ "statistics data": reportLists, "users data": selectedUsers }}
+        saveFile={() => generateDocument(selectedUsers, reportLists)}
         project={selectedUsers}
       />
       <Loading active={isLoading} />
@@ -95,34 +121,40 @@ const UserTable = ({
           <Thead >
             <Tr textTransform="lowercase" >
               <THeader alignment="left" />
-              <THeader width={"120px"} text={i18n.t("userTable.th2")} />
-              <THeader text={i18n.t("userTable.th3")} />
-              <THeader text={i18n.t("userTable.th4")} />
+              <THeader width={"120px"} text={i18n.t("userTable.th2")} weight={800} />
+              <THeader text={i18n.t("userTable.th3")} weight={800} />
+              <THeader text={i18n.t("userTable.th4")} weight={800} />
+              <THeader text={i18n.t("userTable.th5")} weight={800} />
+              <THeader text={i18n.t("userTable.th6")} weight={800} />
+              <THeader text={i18n.t("userTable.th7")} weight={800} />
             </Tr>
           </Thead>
           <Tbody>
             {commentsReport
               ?.sort((a, b) => sortString(a["name"], b["name"]))
               .map((comment, i) => {
+                const commentEngagement = comment.comments * 100;
+                const replyEngagement = (((comment.replies * 100) / commentGoal));
+                const totalEngagement = ((commentEngagement + replyEngagement) / 2).toFixed(0);
                 return (
                   <>
                     <Tr key={i}>
                       <Td
-                        key={comment.name} 
-                        textTransform="lowercase" 
+                        key={comment.name}
+                        textTransform="lowercase"
                         display='flex'
                       >
-                        <Checkbox 
+                        <Checkbox
                           marginRight={3}
                           key={comment.id}
                           isChecked={selectedUsers[i] ? true : false}
                           onChange={() => {
                             const users = [...selectedUsers]
-                            if(selectedUsers[i]) {
+                            if (selectedUsers[i]) {
                               delete users[i]
                               setSelectedUsers(users)
                             } else {
-                              users[i] = {...commentsReport[i]}
+                              users[i] = { ...commentsReport[i] }
                               setSelectedUsers(users)
                             }
                           }}
@@ -133,15 +165,22 @@ const UserTable = ({
                       <Td key={comment.name + comment.comments} textAlign="center">
                         {comment.comments || 0}
                       </Td>
-                      <Td key={comment.answers + comment.name} textAlign="center">
-                        {comment.answers || 0}
+                      <Td key={comment.replies + comment.name} textAlign="center">
+                        {comment.replies || 0}
                       </Td>
-                      <Td
-                        key={comment.name + comment.agreements + comment.user}
-                        textAlign="center"
-                      >
+                      <Td key={comment.name + comment.agreements + comment.user} textAlign="center">
                         {comment.agreements || 0}
                       </Td>
+                      <Td key={comment.name + comment.agreements + comment.user + comment.name} textAlign="center">
+                        {selectedUsers[i] !== undefined ? `${commentEngagement} %` : 'desconsiderado'}
+                      </Td>
+                      <Td key={comment.name + comment.agreements + comment.user + comment.name + comment.name} textAlign="center">
+                        {selectedUsers[i] !== undefined ? `${replyEngagement.toFixed(0)} %` : 'desconsiderado'}
+                      </Td>
+                      <Td key={comment.name + comment.agreements + comment.user + comment.name + comment.user} textAlign="center">
+                        {selectedUsers[i] !== undefined ? `${totalEngagement} %` : 'desconsiderado'}
+                      </Td>
+
                     </Tr>
                   </>
                 );
@@ -149,7 +188,7 @@ const UserTable = ({
           </Tbody>
         </Table>
       )
-        
+
       }
     </Fragment>
   );
