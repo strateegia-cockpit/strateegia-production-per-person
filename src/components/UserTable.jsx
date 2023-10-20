@@ -24,7 +24,7 @@ const UserTable = ({
 
   const commentGoal = selectedUsers !== null ? selectedUsers.filter(user => user !== undefined && user !== 'empty').length * 0.1 : 0
   console.log('commentGoal', commentGoal)
-  
+
   useEffect(() => {
     console.log('selectedUsers', selectedUsers)
   }, [selectedUsers])
@@ -49,76 +49,68 @@ const UserTable = ({
   useEffect(() => {
     const selectUsers = commentsReport !== null ? [...commentsReport] : null
     selectUsers?.sort((a, b) => sortString(a["name"], b["name"]))
-    setSelectedUsers(selectUsers);  
+    setSelectedUsers(selectUsers);
   }, [commentsReport]);
 
   useEffect(() => {
-    const filteredUsers = selectedUsers ? selectedUsers.filter(user => user !== undefined && user !== 'empty') : commentsReport
-    if (filteredUsers) {
-      const commentsList = filteredUsers.map((d) => d.comments || 0);
-      const repliesList = filteredUsers.map((d) => d.replies || 0);
-
-      const commentsListMean = mean(commentsList);
-      const commentsListStDev = stdev(commentsList);
-
-      const commentsListEquilibriumIndex =
-        (1 - commentsListStDev / commentsListMean) * 100;
-
-      const repliesListMean = mean(repliesList);
-      const repliesListStDev = stdev(repliesList);
-      const repliesListEquilibriumIndex =
-        (1 - repliesListStDev / repliesListMean) * 100;
-
-      const totalEquilibriumIndex =
-        (commentsListEquilibriumIndex + repliesListEquilibriumIndex) / 2;
-
-      const commentEngagementList = filteredUsers.map((d) => d.comments * 100 || 0);
-      const replyEngagementList = filteredUsers.map((d) => ((d.comments * 100) / commentGoal) || 0);
-      const totalEngagementList = filteredUsers.map((d) => {
-        const commentEngagement = d.comments * 100;
-        return (commentEngagement + (commentEngagement / commentGoal)) / 2 || 0;
-      });
-      
-      const commentEngagementMean = mean(commentEngagementList);
-      const replyEngagementMean = mean(replyEngagementList);
-      const totalEngagementMean = mean(totalEngagementList);
-
-      const commentEngagementStDev = stdev(commentEngagementList);
-      const replyEngagementStDev = stdev(replyEngagementList);
-      const totalEngagementStDev = stdev(totalEngagementList);
-
-
-      const outputLists = {
-        commentsListMean,
-        commentsListStDev,
-        commentsListEquilibriumIndex,
-        repliesListMean,
-        repliesListStDev,
-        repliesListEquilibriumIndex,
-        commentEngagementMean,
-        replyEngagementMean,
-        totalEngagementMean,
-        commentEngagementStDev,
-        replyEngagementStDev,
-        totalEngagementStDev,
-        totalEquilibriumIndex,
-      };
-      setReportLists({ ...outputLists });
-    } else {
+    if (!selectedUsers) {
       setReportLists(null);
+      return;
     }
+  
+    const filteredUsers = selectedUsers.filter(user => user !== undefined && user !== 'empty') || commentsReport;
+  
+    const extractData = (key) => filteredUsers.map((d) => d[key] || 0);
+    const calculateEquilibriumIndex = (mean, stdev) => (1 - stdev / mean) * 100;
+    const calculateEngagement = (comments) => comments * 100;
+    const calculateReplyEngagement = (comments) => (comments * 100) / commentGoal;
+  
+    const commentsList = extractData('comments');
+    const repliesList = extractData('replies');
+  
+    const commentsListMean = mean(commentsList);
+    const commentsListStDev = stdev(commentsList);
+    const commentsListEquilibriumIndex = calculateEquilibriumIndex(commentsListMean, commentsListStDev);
+  
+    const repliesListMean = mean(repliesList);
+    const repliesListStDev = stdev(repliesList);
+    const repliesListEquilibriumIndex = calculateEquilibriumIndex(repliesListMean, repliesListStDev);
+  
+    const totalEquilibriumIndex = (commentsListEquilibriumIndex + repliesListEquilibriumIndex) / 2;
+  
+    const commentEngagementList = filteredUsers.map(d => calculateEngagement(d.comments));
+    const replyEngagementList = filteredUsers.map(d => calculateReplyEngagement(d.comments));
+    const totalEngagementList = filteredUsers.map(d => {
+      const commentEngagement = calculateEngagement(d.comments);
+      return (commentEngagement + calculateReplyEngagement(d.comments)) / 2;
+    });
+  
+    const outputLists = {
+      commentsListMean,
+      commentsListStDev,
+      commentsListEquilibriumIndex,
+      repliesListMean,
+      repliesListStDev,
+      repliesListEquilibriumIndex,
+      commentEngagementMean: mean(commentEngagementList),
+      replyEngagementMean: mean(replyEngagementList),
+      totalEngagementMean: mean(totalEngagementList),
+      commentEngagementStDev: stdev(commentEngagementList),
+      replyEngagementStDev: stdev(replyEngagementList),
+      totalEngagementStDev: stdev(totalEngagementList),
+      totalEquilibriumIndex,
+    };
+  
+    setReportLists({ ...outputLists });
   }, [selectedUsers]);
 
-
-
-  
   return (
     <Fragment>
-      <ExportsButtons 
-        users={selectedUsers ? selectedUsers : ''} 
-        stats={reportLists ? [reportLists] : ''} 
-        rawData={{"statistics data" : reportLists , "users data" : selectedUsers}} 
-        saveFile={() => generateDocument(selectedUsers, reportLists)} 
+      <ExportsButtons
+        users={selectedUsers ? selectedUsers : ''}
+        stats={reportLists ? [reportLists] : ''}
+        rawData={{ "statistics data": reportLists, "users data": selectedUsers }}
+        saveFile={() => generateDocument(selectedUsers, reportLists)}
         project={selectedUsers}
       />
       <Loading active={isLoading} />
@@ -151,21 +143,21 @@ const UserTable = ({
                   <>
                     <Tr key={i}>
                       <Td
-                        key={comment.name} 
-                        textTransform="lowercase" 
+                        key={comment.name}
+                        textTransform="lowercase"
                         display='flex'
                       >
-                        <Checkbox 
+                        <Checkbox
                           marginRight={3}
                           key={comment.id}
                           isChecked={selectedUsers[i] ? true : false}
                           onChange={() => {
                             const users = [...selectedUsers]
-                            if(selectedUsers[i]) {
+                            if (selectedUsers[i]) {
                               delete users[i]
                               setSelectedUsers(users)
                             } else {
-                              users[i] = {...commentsReport[i]}
+                              users[i] = { ...commentsReport[i] }
                               setSelectedUsers(users)
                             }
                           }}
@@ -191,7 +183,7 @@ const UserTable = ({
                       <Td key={comment.name + comment.agreements + comment.user + comment.name + comment.user} textAlign="center">
                         {totalEngagement} %
                       </Td>
-                      
+
                     </Tr>
                   </>
                 );
@@ -199,7 +191,7 @@ const UserTable = ({
           </Tbody>
         </Table>
       )
-        
+
       }
     </Fragment>
   );
