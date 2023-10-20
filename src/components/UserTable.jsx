@@ -23,11 +23,6 @@ const UserTable = ({
   const [combinedCsv, setCombinedCsv] = React.useState('');
 
   const commentGoal = selectedUsers !== null ? selectedUsers.filter(user => user !== undefined && user !== 'empty').length * 0.1 : 0
-  console.log('commentGoal', commentGoal)
-
-  useEffect(() => {
-    console.log('selectedUsers', selectedUsers)
-  }, [selectedUsers])
 
   useEffect(() => {
     async function fetchData() {
@@ -58,7 +53,8 @@ const UserTable = ({
       return;
     }
   
-    const filteredUsers = selectedUsers.filter(user => user !== undefined && user !== 'empty') || commentsReport;
+    const filteredUsers = selectedUsers.filter(user => user !== undefined && user !== 'empty');
+    console.log('filteredUsers', filteredUsers)
   
     const extractData = (key) => filteredUsers.map((d) => d[key] || 0);
     const calculateEquilibriumIndex = (mean, stdev) => (1 - stdev / mean) * 100;
@@ -80,6 +76,7 @@ const UserTable = ({
   
     const commentEngagementList = filteredUsers.map(d => calculateEngagement(d.comments));
     const replyEngagementList = filteredUsers.map(d => calculateReplyEngagement(d.comments));
+    console.log('replyEngagementList', replyEngagementList)
     const totalEngagementList = filteredUsers.map(d => {
       const commentEngagement = calculateEngagement(d.comments);
       return (commentEngagement + calculateReplyEngagement(d.comments)) / 2;
@@ -136,9 +133,9 @@ const UserTable = ({
             {commentsReport
               ?.sort((a, b) => sortString(a["name"], b["name"]))
               .map((comment, i) => {
-                const commentEngagement = comment.comments * 100 || 0;
-                const replyEngagement = ((comment.comments * 100) / commentGoal) || 0;
-                const totalEngagement = (commentEngagement + replyEngagement) / 2;
+                const commentEngagement = comment.comments * 100;
+                const replyEngagement = (((comment.replies * 100) / commentGoal));
+                const totalEngagement = ((commentEngagement + replyEngagement) / 2).toFixed(0);
                 return (
                   <>
                     <Tr key={i}>
@@ -175,13 +172,13 @@ const UserTable = ({
                         {comment.agreements || 0}
                       </Td>
                       <Td key={comment.name + comment.agreements + comment.user + comment.name} textAlign="center">
-                        {commentEngagement} %
+                        {selectedUsers[i] !== undefined ? `${commentEngagement} %` : 'desconsiderado'}
                       </Td>
                       <Td key={comment.name + comment.agreements + comment.user + comment.name + comment.name} textAlign="center">
-                        {replyEngagement} %
+                        {selectedUsers[i] !== undefined ? `${replyEngagement.toFixed(0)} %` : 'desconsiderado'}
                       </Td>
                       <Td key={comment.name + comment.agreements + comment.user + comment.name + comment.user} textAlign="center">
-                        {totalEngagement} %
+                        {selectedUsers[i] !== undefined ? `${totalEngagement} %` : 'desconsiderado'}
                       </Td>
 
                     </Tr>
