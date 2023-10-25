@@ -54,12 +54,11 @@ const UserTable = ({
     }
   
     const filteredUsers = selectedUsers.filter(user => user !== undefined && user !== 'empty');
-    console.log('filteredUsers', filteredUsers)
   
     const extractData = (key) => filteredUsers.map((d) => d[key] || 0);
     const calculateEquilibriumIndex = (mean, stdev) => (1 - stdev / mean) * 100;
-    const calculateEngagement = (comments) => comments * 100;
-    const calculateReplyEngagement = (comments) => (comments * 100) / commentGoal;
+    const calculateEngagement = (comments, questionsAmount) => comments * 100 / questionsAmount;
+    const calculateReplyEngagement = (comments, questionsAmount) => (comments * 100 / questionsAmount) / commentGoal;
   
     const commentsList = extractData('comments');
     const repliesList = extractData('replies');
@@ -74,12 +73,11 @@ const UserTable = ({
   
     const totalEquilibriumIndex = (commentsListEquilibriumIndex + repliesListEquilibriumIndex) / 2;
   
-    const commentEngagementList = filteredUsers.map(d => calculateEngagement(d.comments));
-    const replyEngagementList = filteredUsers.map(d => calculateReplyEngagement(d.comments));
-    console.log('replyEngagementList', replyEngagementList)
+    const commentEngagementList = filteredUsers.map(d => calculateEngagement(d.comments, d.questionsAmount));
+    const replyEngagementList = filteredUsers.map(d => calculateReplyEngagement(d.comments, d.questionsAmount));
     const totalEngagementList = filteredUsers.map(d => {
-      const commentEngagement = calculateEngagement(d.comments);
-      return (commentEngagement + calculateReplyEngagement(d.comments)) / 2;
+      const commentEngagement = calculateEngagement(d.comments, d.questionsAmount);
+      return (commentEngagement + calculateReplyEngagement(d.comments, d.questionsAmount)) / 2;
     });
   
     const outputLists = {
@@ -133,8 +131,8 @@ const UserTable = ({
             {commentsReport
               ?.sort((a, b) => sortString(a["name"], b["name"]))
               .map((comment, i) => {
-                const commentEngagement = comment.comments * 100;
-                const replyEngagement = (((comment.replies * 100) / commentGoal));
+                const commentEngagement = comment.comments * 100 / comment.questionsAmount;
+                const replyEngagement = (((comment.replies * 100 / comment.questionsAmount) / commentGoal));
                 const totalEngagement = ((commentEngagement + replyEngagement) / 2).toFixed(0);
                 return (
                   <>

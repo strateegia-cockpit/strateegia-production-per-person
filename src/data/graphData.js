@@ -16,8 +16,16 @@ const getComments = async (accessToken, divPointId) => {
   const comments = await Promise.all(
     divPointId?.map(async ({ value }) => {
       const data = await api.getCommentsGroupedByQuestionReport(accessToken, value);
-      const getOnlyComments = await data?.map(({ comments }) => comments);
-      return getOnlyComments.flat();
+      const getOnlyComments = await data?.map(({ comments }) => comments).flat();
+
+      const questionIds = getOnlyComments?.map(({ question_id }) => question_id);
+      const questionIdsUnique = [...new Set(questionIds)];
+      const questionIdsUniqueAmount = questionIdsUnique.length;
+
+      return {
+        comments: getOnlyComments,
+        questionsAmount: questionIdsUniqueAmount
+      };
     })
   )
   return comments.flat();
@@ -33,7 +41,15 @@ const getCount = (arrayToReduce) => {
 export async function gatherData(accessToken, projectId, mapId, divPointId) {
   const data = await gatherPoints(accessToken, projectId, mapId);
 
-  const comments = await getComments(accessToken, divPointId);
+  const res = await getComments(accessToken, divPointId);
+  const comments = res.map(({ comments }) => {
+      return comments;
+    }
+  ).flat();
+  const questionsAmount = res.map(({ questionsAmount }) => {
+    return questionsAmount;
+  }
+  ).reduce((acc, val) => acc + val, 0);
 
   const replies = comments.map(({ replies }) => {
     return replies;
@@ -53,7 +69,7 @@ export async function gatherData(accessToken, projectId, mapId, divPointId) {
   });
 
   const usersForUserTable = users.map(user => {
-    return [{ ...user, 'comments': usersCommentsCount[user['id']] || 0, 'replies': usersAnswersCount[user['id']] || 0, 'agreements': usersAgreementsCount[user['id']] || 0 }];
+    return [{ ...user, 'comments': usersCommentsCount[user['id']] || 0, 'replies': usersAnswersCount[user['id']] || 0, 'agreements': usersAgreementsCount[user['id']] || 0, questionsAmount: questionsAmount }];
   });
 
   return usersForUserTable.flat();

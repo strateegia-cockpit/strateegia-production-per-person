@@ -68,6 +68,9 @@ export const StatisticsTable = ({ reportLists }) => {
           <Td>índice de equilíbrio</Td>
           <Td>{ifNegativeShowZero(reportLists?.commentsListEquilibriumIndex)}%</Td>
           <Td>{ifNegativeShowZero(reportLists?.repliesListEquilibriumIndex)}%</Td>
+          <Td>Não se aplica</Td>
+          <Td>Não se aplica</Td>
+          <Td>Não se aplica</Td>
           <Td></Td>
         </Tr>
         <Tr key="total">
