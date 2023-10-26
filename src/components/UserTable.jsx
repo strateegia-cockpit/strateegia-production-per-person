@@ -131,7 +131,7 @@ const UserTable = ({
             {commentsReport
               ?.sort((a, b) => sortString(a["name"], b["name"]))
               .map((comment, i) => {
-                const commentEngagement = comment.comments * 100 / comment.questionsAmount;
+                const commentEngagement = (comment.comments * 100 / comment.questionsAmount);
                 const replyEngagement = (((comment.replies * 100 / comment.questionsAmount) / commentGoal));
                 const totalEngagement = ((commentEngagement + replyEngagement) / 2).toFixed(0);
                 return (
@@ -170,7 +170,7 @@ const UserTable = ({
                         {comment.agreements || 0}
                       </Td>
                       <Td key={comment.name + comment.agreements + comment.user + comment.name} textAlign="center">
-                        {selectedUsers[i] !== undefined ? `${commentEngagement} %` : 'desconsiderado'}
+                        {selectedUsers[i] !== undefined ? `${commentEngagement.toFixed(0)} %` : 'desconsiderado'}
                       </Td>
                       <Td key={comment.name + comment.agreements + comment.user + comment.name + comment.name} textAlign="center">
                         {selectedUsers[i] !== undefined ? `${replyEngagement.toFixed(0)} %` : 'desconsiderado'}

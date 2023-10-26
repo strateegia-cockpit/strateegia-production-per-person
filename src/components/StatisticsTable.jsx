@@ -28,53 +28,53 @@ export const StatisticsTable = ({ reportLists }) => {
       </Thead>
       <Tbody>
         <Tr key="mean">
-          <Td>média</Td>
-          <Td>{ifNegativeShowZero(reportLists?.commentsListMean)}</Td>
-          <Td>{ifNegativeShowZero(reportLists?.repliesListMean)}</Td>
-          <Td>{ifNegativeShowZero(reportLists?.commentEngagementMean)} %</Td>
-          <Td>{ifNegativeShowZero(reportLists?.replyEngagementMean)} %</Td>
-          <Td>{ifNegativeShowZero(reportLists?.totalEngagementMean)} %</Td>
-          <Td></Td>
+          <Td textAlign={'center'}>média</Td>
+          <Td textAlign={'center'}>{ifNegativeShowZero(reportLists?.commentsListMean)}</Td>
+          <Td textAlign={'center'}>{ifNegativeShowZero(reportLists?.repliesListMean)}</Td>
+          <Td textAlign={'center'}>{ifNegativeShowZero(reportLists?.commentEngagementMean)} %</Td>
+          <Td textAlign={'center'}>{ifNegativeShowZero(reportLists?.replyEngagementMean)} %</Td>
+          <Td textAlign={'center'}>{ifNegativeShowZero(reportLists?.totalEngagementMean)} %</Td>
+          <Td textAlign={'center'}></Td>
         </Tr>
         {/* ifNegativeShowZero() */}
         {/* <Tr key="median">
-          <Td>mediana</Td>
-          <Td>{calculateMedian("comments")}</Td>
-          <Td>{calculateMedian("replies")}</Td>
-          <Td></Td>
+          <Td textAlign={'center'}>mediana</Td>
+          <Td textAlign={'center'}>{calculateMedian("comments")}</Td>
+          <Td textAlign={'center'}>{calculateMedian("replies")}</Td>
+          <Td textAlign={'center'}></Td>
         </Tr>
         <Tr key="mode">
-          <Td>moda</Td>
-          <Td>{calculateMode("comments")}</Td>
-          <Td>{calculateMode("replies")}</Td>
-          <Td></Td>
+          <Td textAlign={'center'}>moda</Td>
+          <Td textAlign={'center'}>{calculateMode("comments")}</Td>
+          <Td textAlign={'center'}>{calculateMode("replies")}</Td>
+          <Td textAlign={'center'}></Td>
         </Tr> */}
         <Tr key="stddev">
-          <Td>desvio padrão</Td>
-          <Td>{ifNegativeShowZero(reportLists?.commentsListStDev)}</Td>
-          <Td>{ifNegativeShowZero(reportLists?.repliesListStDev)}</Td>
-          <Td>{ifNegativeShowZero(reportLists?.commentEngagementStDev)} %</Td>
-          <Td>{ifNegativeShowZero(reportLists?.replyEngagementStDev)} %</Td>
-          <Td>{ifNegativeShowZero(reportLists?.totalEngagementStDev)} %</Td>
-          <Td></Td>
+          <Td textAlign={'center'}>desvio padrão</Td>
+          <Td textAlign={'center'}>{ifNegativeShowZero(reportLists?.commentsListStDev)}</Td>
+          <Td textAlign={'center'}>{ifNegativeShowZero(reportLists?.repliesListStDev)}</Td>
+          <Td textAlign={'center'}>{ifNegativeShowZero(reportLists?.commentEngagementStDev)} %</Td>
+          <Td textAlign={'center'}>{ifNegativeShowZero(reportLists?.replyEngagementStDev)} %</Td>
+          <Td textAlign={'center'}>{ifNegativeShowZero(reportLists?.totalEngagementStDev)} %</Td>
+          <Td textAlign={'center'}></Td>
         </Tr>
         {/* <Tr key="variance">
-          <Td>variância</Td>
-          <Td>{calculateVariance("comments")}</Td>
-          <Td>{calculateVariance("replies")}</Td>
-          <Td></Td>
+          <Td textAlign={'center'}>variância</Td>
+          <Td textAlign={'center'}>{calculateVariance("comments")}</Td>
+          <Td textAlign={'center'}>{calculateVariance("replies")}</Td>
+          <Td textAlign={'center'}></Td>
         </Tr> */}
         <Tr key="coefficient">
-          <Td>índice de equilíbrio</Td>
-          <Td>{ifNegativeShowZero(reportLists?.commentsListEquilibriumIndex)}%</Td>
-          <Td>{ifNegativeShowZero(reportLists?.repliesListEquilibriumIndex)}%</Td>
-          <Td>Não se aplica</Td>
-          <Td>Não se aplica</Td>
-          <Td>Não se aplica</Td>
-          <Td></Td>
+          <Td textAlign={'center'}>índice de equilíbrio</Td>
+          <Td textAlign={'center'}>{ifNegativeShowZero(reportLists?.commentsListEquilibriumIndex)}%</Td>
+          <Td textAlign={'center'}>{ifNegativeShowZero(reportLists?.repliesListEquilibriumIndex)}%</Td>
+          <Td textAlign={'center'}>Não se aplica</Td>
+          <Td textAlign={'center'}>Não se aplica</Td>
+          <Td textAlign={'center'}>Não se aplica</Td>
+          <Td textAlign={'center'}></Td>
         </Tr>
         <Tr key="total">
-          <Td>índice de equilíbrio - respostas e comentários</Td>
+          <Td textAlign={'center'}>índice de equilíbrio - respostas e comentários</Td>
           <Td colSpan={3}>{ifNegativeShowZero(reportLists?.totalEquilibriumIndex)}%</Td>
         </Tr>
       </Tbody>
