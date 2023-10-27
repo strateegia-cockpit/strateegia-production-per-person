@@ -75,7 +75,7 @@ export const StatisticsTable = ({ reportLists }) => {
         </Tr>
         <Tr key="total">
           <Td textAlign={'center'}>índice de equilíbrio - respostas e comentários</Td>
-          <Td colSpan={3}>{ifNegativeShowZero(reportLists?.totalEquilibriumIndex)}%</Td>
+          <Td textAlign={'center'} colSpan={3}>{ifNegativeShowZero(reportLists?.totalEquilibriumIndex)}%</Td>
         </Tr>
       </Tbody>
     </Fragment>
