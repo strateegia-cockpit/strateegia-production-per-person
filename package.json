@@ -24,7 +24,8 @@
     "react-select": "^5.4.0",
     "stats-lite": "^2.2.0",
     "strateegia-api": "^0.0.6",
-    "web-vitals": "^0.2.4"
+    "web-vitals": "^0.2.4",
+    "xlsx": "^0.18.5"
   },
   "scripts": {
     "start": "react-scripts start",
